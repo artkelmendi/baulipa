@@ -252,10 +252,8 @@ export default function PerspectiveTunnelHero({
             <p className="tunnel-eyebrow">
               Your space. A world of possibilities.
             </p>
-            <h1 id="hero-title">
-              A life by
-              <br />
-              <span>the water.</span>
+            <h1 id="hero-title" aria-label="baulipa">
+              bau<span>lipa</span>
             </h1>
             <p className="tunnel-description">
               Considered pools. Everyday escapes.

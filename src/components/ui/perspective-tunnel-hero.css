@@ -124,12 +124,17 @@
 }
 .tunnel-copy h1 {
   font-size: clamp(76px, 8.5vw, 132px);
-  font-weight: 500;
+  font-weight: 450;
+  color: #111;
+  white-space: nowrap;
   letter-spacing: -0.075em;
   line-height: 0.94;
 }
 .tunnel-copy h1 > span {
-  color: var(--blue);
+  font-weight: 650;
+}
+[data-theme="dark"] .tunnel-copy h1 {
+  color: var(--ink);
 }
 .tunnel-description {
   font-size: 14px;
