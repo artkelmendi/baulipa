@@ -1,10 +1,11 @@
+import { sitePath } from "./paths.js";
 // Illustrative product selection. Replace with BAULIPA's confirmed catalog before commercial launch.
 export const products = [
   {
     id: "cleaner",
     name: "Cordless pool cleaner",
     category: "Cleaning",
-    image: "/images/product-cleaner.webp",
+    image: sitePath("/images/product-cleaner.webp"),
     description:
       "Make less work of pool days. Explore automatic cleaning options for a pool that is always inviting.",
     details: [
@@ -18,7 +19,7 @@ export const products = [
     id: "care",
     name: "Water care essentials",
     category: "Water care",
-    image: "/images/product-care.webp",
+    image: sitePath("/images/product-care.webp"),
     description:
       "Clear water starts with the right balance. Find a water care routine that suits your pool.",
     details: [
@@ -32,7 +33,7 @@ export const products = [
     id: "pump",
     name: "Pool circulation pump",
     category: "Equipment",
-    image: "/images/product-pump.webp",
+    image: sitePath("/images/product-pump.webp"),
     description:
       "The heart of a well-considered pool. Explore circulation equipment matched to your filtration system.",
     details: [
@@ -46,7 +47,7 @@ export const products = [
     id: "tools",
     name: "Everyday maintenance set",
     category: "Cleaning",
-    image: "/images/product-tools.webp",
+    image: sitePath("/images/product-tools.webp"),
     description:
       "A little attention goes a long way. Keep the essentials close for the everyday care of your pool.",
     details: [
@@ -63,8 +64,8 @@ export const pools = [
     id: "white",
     title: "A softer kind of summer.",
     type: "White stone pools",
-    image: "/images/pool-white.webp",
-    thumbnail: "/images/pool-white-thumb.webp",
+    image: sitePath("/images/pool-white.webp"),
+    thumbnail: sitePath("/images/pool-white-thumb.webp"),
     description:
       "Sculptural curves, bright mineral finishes and pale blue water. A lighter direction for a pool that feels part of the architecture.",
     features: [
@@ -77,8 +78,8 @@ export const pools = [
     id: "black",
     title: "A different depth.",
     type: "Black basalt pools",
-    image: "/images/pool-black.webp",
-    thumbnail: "/images/pool-black-thumb.webp",
+    image: sitePath("/images/pool-black.webp"),
+    thumbnail: sitePath("/images/pool-black-thumb.webp"),
     description:
       "Dark stone. Reflective water. A quieter, more architectural pool with a connection to the surrounding landscape.",
     features: [
@@ -91,8 +92,8 @@ export const pools = [
     id: "rooftop",
     title: "Above the everyday.",
     type: "Rooftop pools",
-    image: "/images/pool-rooftop.webp",
-    thumbnail: "/images/pool-rooftop-thumb.webp",
+    image: sitePath("/images/pool-rooftop.webp"),
+    thumbnail: sitePath("/images/pool-rooftop-thumb.webp"),
     description:
       "A new perspective on a day by the pool. Open views, clean edges and a design considered around its setting.",
     features: [
@@ -105,8 +106,8 @@ export const pools = [
     id: "indoor",
     title: "Your own quiet world.",
     type: "Indoor & spa pools",
-    image: "/images/pool-indoor.webp",
-    thumbnail: "/images/pool-indoor-thumb.webp",
+    image: sitePath("/images/pool-indoor.webp"),
+    thumbnail: sitePath("/images/pool-indoor-thumb.webp"),
     description:
       "Deep green mosaic, natural light and warm stone. An indoor pool can become a space to pause, in every season.",
     features: [
@@ -119,8 +120,8 @@ export const pools = [
     id: "mosaic",
     title: "Summer, in full colour.",
     type: "Blue mosaic pools",
-    image: "/images/pool-mosaic.webp",
-    thumbnail: "/images/pool-mosaic-thumb.webp",
+    image: sitePath("/images/pool-mosaic.webp"),
+    thumbnail: sitePath("/images/pool-mosaic-thumb.webp"),
     description:
       "Blue mosaic and a softer outline bring a familiar joy to the garden. A pool with colour, character and room to unwind.",
     features: [
@@ -133,8 +134,8 @@ export const pools = [
     id: "natural",
     title: "A little closer to nature.",
     type: "Natural swimming pools",
-    image: "/images/pool-natural.webp",
-    thumbnail: "/images/pool-natural-thumb.webp",
+    image: sitePath("/images/pool-natural.webp"),
+    thumbnail: sitePath("/images/pool-natural-thumb.webp"),
     description:
       "Reflective green water, timber and soft planting. A landscape-led direction for a different kind of swimming space.",
     features: [

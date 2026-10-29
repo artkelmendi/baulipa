@@ -2305,6 +2305,16 @@ h2 {
 }
 
 /* Restore native dialog centering after the CSS reset. */
-.dialog { inset: 0; margin: auto; }
-.questions-list details { overflow: hidden; }
+.dialog {
+  inset: 0;
+  margin: auto;
+}
+.questions-list details {
+  overflow: hidden;
+}
 
+.pool-card-image img {
+  width: 112%;
+  max-width: none;
+  margin-left: -6%;
+}

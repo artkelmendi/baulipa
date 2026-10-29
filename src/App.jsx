@@ -24,6 +24,7 @@ import { products, pools, processSteps } from "./data";
 import PerspectiveTunnelHero from "@/components/ui/perspective-tunnel-hero";
 import WaterReflections from "@/components/ui/water-reflections";
 import ProductPage from "./components/ProductPage";
+import { sitePath, routePath } from "./paths";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -116,11 +117,62 @@ function Dialog({ open, onClose, titleId, className = "", children }) {
 
 function useChoreography(root, galleryTween) {
   useLayoutEffect(() => {
-    if (window.location.pathname.startsWith("/products")) return;
+    if (routePath().startsWith("/products")) return;
     const media = gsap.matchMedia();
     let active = true;
     const ctx = gsap.context(() => {
       media.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.from(".gallery-heading h2", {
+          clipPath: "inset(0 0 100% 0)",
+          y: 35,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".pool-gallery",
+            start: "top 85%",
+            once: true,
+          },
+        });
+        gsap.utils
+          .toArray(".pool-card-image, .shop .product-image")
+          .forEach((el, i) => {
+            const tl = gsap.timeline({
+              scrollTrigger: { trigger: el, start: "top 92%", once: true },
+            });
+            tl.from(el, {
+              clipPath: "inset(100% 0 0 0)",
+              duration: 1,
+              ease: "power3.inOut",
+            }).fromTo(
+              el.querySelector("img"),
+              { scale: 1.13, yPercent: 12 },
+              { scale: 1, yPercent: 0, duration: 1.3, ease: "power3.out" },
+              0,
+            );
+          });
+        gsap.from(".process-step", {
+          opacity: 0,
+          y: 30,
+          stagger: 0.12,
+          duration: 0.85,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".process-steps",
+            start: "top 85%",
+            once: true,
+          },
+        });
+        gsap.utils
+          .toArray(".shop-header h2, .contact h2")
+          .forEach((el) =>
+            gsap.from(el, {
+              clipPath: "inset(0 0 100% 0)",
+              y: 30,
+              duration: 1,
+              ease: "power3.out",
+              scrollTrigger: { trigger: el, start: "top 90%", once: true },
+            }),
+          );
         // Header entrance is independent of the supplied Motion-driven tunnel hero.
         gsap.from(".header-brand, .desktop-nav, .header-actions", {
           opacity: 0,
@@ -201,6 +253,23 @@ function useChoreography(root, galleryTween) {
               invalidateOnRefresh: true,
             },
           });
+          gsap.utils.toArray(".pool-card").forEach((card) => {
+            gsap.fromTo(
+              card.querySelector("img"),
+              { xPercent: -4 },
+              {
+                xPercent: 4,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: card,
+                  containerAnimation: galleryTween.current,
+                  start: "left right",
+                  end: "right left",
+                  scrub: true,
+                },
+              },
+            );
+          });
           return () => {
             galleryTween.current = null;
           };
@@ -225,7 +294,7 @@ function useChoreography(root, galleryTween) {
 }
 
 function App() {
-  const isProductsPage = window.location.pathname.startsWith("/products");
+  const isProductsPage = routePath().startsWith("/products");
   // Trial switch: ?water=off#contact shows the exact invitation without the effect.
   const waterReflectionsEnabled =
     new URLSearchParams(window.location.search).get("water") !== "off";
@@ -386,13 +455,17 @@ function App() {
         Skip to content
       </a>
       <header className="header shell">
-        <a className="header-brand wordmark" href="/" aria-label="BAULIPA home">
+        <a
+          className="header-brand wordmark"
+          href={sitePath("/")}
+          aria-label="BAULIPA home"
+        >
           baulipa<span className="brand-period">.</span>
         </a>
         <nav className="desktop-nav" aria-label="Main navigation">
-          <a href="/#pools">Our pools</a>
-          <a href="/#approach">Our approach</a>
-          <a href="/products/">
+          <a href={sitePath("/#pools")}>Our pools</a>
+          <a href={sitePath("/#approach")}>Our approach</a>
+          <a href={sitePath("/products/")}>
             Pool shop <ArrowUpRight size={14} />
           </a>
         </nav>
@@ -455,7 +528,7 @@ function App() {
                   <br />
                   From the first sketch to the everyday details.
                 </p>
-                <a className="text-link" href="/#approach">
+                <a className="text-link" href={sitePath("/#approach")}>
                   Meet our approach <ArrowDown size={18} />
                 </a>
               </div>
@@ -480,17 +553,17 @@ function App() {
                 )}
               </div>
               <div className="service-strip" data-reveal>
-                <a href="/#pools">
+                <a href={sitePath("/#pools")}>
                   <Waves size={27} weight="light" />
                   <span>Made for your space</span>
                   <ArrowUpRight size={19} />
                 </a>
-                <a href="/#approach">
+                <a href={sitePath("/#approach")}>
                   <PencilRuler size={27} weight="light" />
                   <span>Built with consideration</span>
                   <ArrowUpRight size={19} />
                 </a>
-                <a href="/products/">
+                <a href={sitePath("/products/")}>
                   <Sun size={27} weight="light" />
                   <span>Ready for every summer</span>
                   <ArrowUpRight size={19} />
@@ -594,7 +667,7 @@ function App() {
                 </div>
                 <div className="process-image">
                   <img
-                    src="/images/pool-mosaic.webp"
+                    src={sitePath("/images/pool-mosaic.webp")}
                     alt="Sunlight rippling across beautifully clear swimming pool water"
                     width="1448"
                     height="1086"
@@ -777,7 +850,7 @@ function App() {
                 </div>
                 <div className="contact-image" data-reveal>
                   <img
-                    src="/images/pool-white.webp"
+                    src={sitePath("/images/pool-white.webp")}
                     alt="A sculptural white stone swimming pool with soft curved steps"
                     width="1448"
                     height="1086"
@@ -834,13 +907,13 @@ function App() {
 
       <footer className="footer shell">
         <div className="footer-top">
-          <a href="/" className="footer-tagline">
+          <a href={sitePath("/")} className="footer-tagline">
             A life by the water.
           </a>
           <nav aria-label="Footer navigation">
-            <a href="/#pools">Our pools</a>
-            <a href="/#approach">Our approach</a>
-            <a href="/products/">Pool shop</a>
+            <a href={sitePath("/#pools")}>Our pools</a>
+            <a href={sitePath("/#approach")}>Our approach</a>
+            <a href={sitePath("/products/")}>Pool shop</a>
             <button onClick={() => openEnquiry()}>
               Start your project <ArrowUpRight size={15} />
             </button>
@@ -882,9 +955,9 @@ function App() {
         </h2>
         <nav aria-label="Mobile navigation">
           {[
-            ["Our pools", "/#pools"],
-            ["Our approach", "/#approach"],
-            ["Pool shop", "/products/"],
+            ["Our pools", sitePath("/#pools")],
+            ["Our approach", sitePath("/#approach")],
+            ["Pool shop", sitePath("/products/")],
           ].map(([label, href]) => (
             <a href={href} key={href} onClick={() => setMenuOpen(false)}>
               {label}
@@ -1041,7 +1114,10 @@ function App() {
               Use the + on a product to save it here. Bring your favourites
               together before preparing an enquiry.
             </p>
-            <Action href="/products/" onClick={() => setBagOpen(false)}>
+            <Action
+              href={sitePath("/products/")}
+              onClick={() => setBagOpen(false)}
+            >
               Explore the collection
             </Action>
           </div>

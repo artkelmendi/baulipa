@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { sitePath, routePath } from "../paths";
 import {
   ArrowUpRight,
   ArrowLeft,
@@ -11,10 +13,114 @@ import WaterReflections from "./ui/water-reflections";
 import "./product-page.css";
 
 export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
+  const pageRef = useRef(null);
   const [category, setCategory] = useState("All essentials");
   const [search, setSearch] = useState("");
-  const id = window.location.pathname.split("/").filter(Boolean)[1];
+  const id = routePath().split("/").filter(Boolean)[1];
   const product = products.find((item) => item.id === id);
+  useLayoutEffect(() => {
+    if (!pageRef.current) return;
+    const media = gsap.matchMedia();
+    const ctx = gsap.context(() => {
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+        intro
+          .from(".products-breadcrumb, .products-intro .eyebrow", {
+            opacity: 0,
+            y: 16,
+            duration: 0.65,
+            stagger: 0.08,
+          })
+          .from(
+            ".products-intro h1",
+            { clipPath: "inset(0 0 100% 0)", y: 45, duration: 1.15 },
+            0.12,
+          )
+          .from(
+            ".products-feature-image",
+            {
+              clipPath: "inset(0 100% 0 0)",
+              duration: 1.2,
+              ease: "power3.inOut",
+            },
+            0.1,
+          )
+          .from(
+            ".products-feature-image img",
+            { scale: 1.15, rotation: 3, duration: 1.5 },
+            0.15,
+          )
+          .from(
+            ".products-lead, .products-intro .text-link",
+            { opacity: 0, y: 20, duration: 0.8, stagger: 0.08 },
+            0.45,
+          );
+        gsap.to(".products-feature-image img", {
+          yPercent: 12,
+          scale: 1.07,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".products-intro",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+          },
+        });
+        gsap.utils
+          .toArray(
+            ".products-catalog-heading, .products-help > div, .product-information > div",
+          )
+          .forEach((el) =>
+            gsap.from(el, {
+              opacity: 0,
+              y: 38,
+              duration: 0.9,
+              ease: "power3.out",
+              scrollTrigger: { trigger: el, start: "top 90%", once: true },
+            }),
+          );
+      });
+    }, pageRef);
+    return () => {
+      media.revert();
+      ctx.revert();
+    };
+  }, []);
+  useLayoutEffect(() => {
+    if (!pageRef.current) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray(".product-card").forEach((card, i) => {
+        const timeline = gsap.timeline({
+          scrollTrigger: { trigger: card, start: "top 92%", once: true },
+        });
+        timeline
+          .from(card.querySelector(".product-image"), {
+            clipPath: "inset(100% 0 0 0)",
+            duration: 0.85,
+            ease: "power3.inOut",
+            delay: i * 0.05,
+          })
+          .from(
+            card.querySelector("img"),
+            { scale: 1.12, yPercent: 12, duration: 1.1, ease: "power3.out" },
+            0,
+          )
+          .from(
+            card.querySelectorAll(".product-category,h3,p"),
+            {
+              opacity: 0,
+              y: 14,
+              duration: 0.55,
+              stagger: 0.05,
+              ease: "power3.out",
+            },
+            0.25,
+          );
+      });
+    }, pageRef);
+    return () => ctx.revert();
+  }, [category, search]);
   useEffect(() => {
     document.title = product
       ? `${product.name} | BAULIPA`
@@ -31,19 +137,19 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
     return (
       <section className="product-page shell">
         <h1>That product isn’t here.</h1>
-        <a className="text-link" href="/products/">
+        <a className="text-link" href={sitePath("/products/")}>
           Back to the collection <ArrowLeft />
         </a>
       </section>
     );
   return (
-    <div className="product-page">
+    <div className="product-page" ref={pageRef}>
       <section className="products-intro shell has-water-reflections contact-top">
         <WaterReflections />
         <div>
           <a
             className="products-breadcrumb"
-            href={product ? "/products/" : "/"}
+            href={sitePath(product ? "/products/" : "/")}
           >
             <ArrowLeft size={15} />
             {product ? "All essentials" : "Back to BAULIPA"}
@@ -73,7 +179,7 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
         </div>
         <div className="products-feature-image">
           <img
-            src={product?.image || "/images/product-cleaner.webp"}
+            src={product?.image || sitePath("/images/product-cleaner.webp")}
             alt={
               product?.name ||
               "Cordless pool cleaner from the pool essentials collection"
@@ -179,7 +285,7 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
                 <div className="product-image">
                   <a
                     className="product-image-link"
-                    href={`/products/${item.id}/`}
+                    href={sitePath(`/products/${item.id}/`)}
                   >
                     <img
                       src={item.image}
@@ -203,7 +309,7 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
                 </div>
                 <span className="product-category">{item.category}</span>
                 <h3>
-                  <a href={`/products/${item.id}/`}>
+                  <a href={sitePath(`/products/${item.id}/`)}>
                     {item.name}
                     <ArrowUpRight size={18} />
                   </a>
