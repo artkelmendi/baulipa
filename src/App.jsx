@@ -22,6 +22,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { products, pools, processSteps } from "./data";
 import PerspectiveTunnelHero from "@/components/ui/perspective-tunnel-hero";
+import WaterReflections from "@/components/ui/water-reflections";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -222,6 +223,9 @@ function useChoreography(root, galleryTween) {
 }
 
 function App() {
+  // Trial switch: ?water=off#contact shows the exact invitation without the effect.
+  const waterReflectionsEnabled =
+    new URLSearchParams(window.location.search).get("water") !== "off";
   const root = useRef(null);
   const galleryTween = useRef(null);
   const galleryViewport = useRef(null);
@@ -244,6 +248,26 @@ function App() {
   });
   const [notice, setNotice] = useState("");
   useChoreography(root, galleryTween);
+
+  useEffect(() => {
+    const targetId = window.location.hash.slice(1);
+    if (!targetId) return;
+    let active = true;
+    let frame = 0;
+    document.fonts.ready.then(() => {
+      if (!active) return;
+      frame = requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+        document
+          .getElementById(targetId)
+          ?.scrollIntoView({ behavior: "instant", block: "start" });
+      });
+    });
+    return () => {
+      active = false;
+      cancelAnimationFrame(frame);
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -671,7 +695,10 @@ function App() {
           id="contact"
           aria-labelledby="contact-title"
         >
-          <div className="contact-top">
+          <div
+            className={`contact-top ${waterReflectionsEnabled ? "has-water-reflections" : ""}`}
+          >
+            {waterReflectionsEnabled && <WaterReflections />}
             <div data-reveal>
               <p>You bring the daydream.</p>
               <h2 id="contact-title">

@@ -1,0 +1,38 @@
+/* Decorative and local to the contact invitation; it never intercepts input. */
+.contact-top.has-water-reflections {
+  position: relative;
+  isolation: isolate;
+}
+.has-water-reflections > [data-reveal] > p {
+  color: color-mix(in srgb, var(--ink) 30%, var(--muted));
+}
+.water-reflections {
+  position: absolute;
+  inset: -76px -48px;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.82;
+  background: radial-gradient(
+    ellipse at 35% 55%,
+    rgb(170 220 234 / 0.22),
+    transparent 72%
+  );
+  mask-image: radial-gradient(ellipse at 37% 50%, #000 15%, transparent 76%);
+}
+.water-reflections canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+@media (max-width: 1200px) {
+  .water-reflections {
+    inset: -64px -36px;
+  }
+}
+@media (max-width: 767px) {
+  .water-reflections {
+    inset: -48px -20px;
+    mask-image: radial-gradient(ellipse at 35% 32%, #000 12%, transparent 73%);
+  }
+}

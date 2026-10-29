@@ -43,3 +43,9 @@ The supplied hero is integrated at `src/components/ui/perspective-tunnel-hero.ts
 Tailwind v4 is installed through its Vite plugin and imported in `src/styles.css`; TypeScript checks the reusable component and utility module. `src/lib/utils.ts` supplies shadcn's standard `cn` helper. The existing application can continue using JSX alongside typed components. Run `npm run typecheck` independently; `npm run build` also checks types.
 
 The new concept collection covers white stone, black basalt, rooftop, indoor/spa, blue mosaic and natural swimming pools. The mobile hero changes the image positions to preserve a central reading area.
+
+## Water reflections trial
+
+The contact invitation includes a pale, slowly moving water surface adapted from claude-directory's Flowing Waves Shader. It uses local WebGL with no new dependency, initializes as the section approaches the viewport, pauses outside it and in hidden tabs, and renders a still image for reduced motion. A static CSS surface remains if WebGL is unavailable. Attribution and the MIT license are in `THIRD_PARTY_NOTICES.md`.
+
+Compare `/?water=off#contact` with `/#contact` to review the original invitation and the water version. The prior complete site remains at commit `f7685d944ec0230ba9ff69fe42b17a1d91957915`. This trial is isolated to the `WaterReflections` component, its stylesheet and its contact-section integration.
