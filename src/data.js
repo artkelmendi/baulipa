@@ -60,42 +60,87 @@ export const products = [
 
 export const pools = [
   {
-    id: "residential",
-    title: "The everyday escape.",
-    type: "Residential pools",
-    image: "/images/pool-hero.webp",
+    id: "white",
+    title: "A softer kind of summer.",
+    type: "White stone pools",
+    image: "/images/pool-white.webp",
+    thumbnail: "/images/pool-white-thumb.webp",
     description:
-      "Early morning dips. Long afternoons. A pool that belongs to your home and the way you live.",
+      "Sculptural curves, bright mineral finishes and pale blue water. A lighter direction for a pool that feels part of the architecture.",
     features: [
-      "Shaped around your outdoor space",
-      "A considered palette of finishes",
-      "Equipment planned from the beginning",
+      "Explore white and pale stone finishes",
+      "Curved forms and generous steps",
+      "Materials selected for your setting",
     ],
   },
   {
-    id: "lap",
-    title: "Find your own rhythm.",
-    type: "Lap & leisure pools",
-    image: "/images/pool-terrace.webp",
+    id: "black",
+    title: "A different depth.",
+    type: "Black basalt pools",
+    image: "/images/pool-black.webp",
+    thumbnail: "/images/pool-black-thumb.webp",
     description:
-      "Room to move, space to pause. Explore a longer pool with clean lines and a connection to the landscape.",
+      "Dark stone. Reflective water. A quieter, more architectural pool with a connection to the surrounding landscape.",
     features: [
-      "Space for swimming and relaxing",
-      "Architectural lines and proportions",
-      "A design that works with your garden",
+      "Explore charcoal and dark stone palettes",
+      "Strong architectural proportions",
+      "Discuss suitable finishes and equipment",
     ],
   },
   {
-    id: "compact",
-    title: "Small space. Big summer.",
-    type: "Courtyard & plunge pools",
-    image: "/images/pool-compact.webp",
+    id: "rooftop",
+    title: "Above the everyday.",
+    type: "Rooftop pools",
+    image: "/images/pool-rooftop.webp",
+    thumbnail: "/images/pool-rooftop-thumb.webp",
     description:
-      "A quiet courtyard can become your favourite place. Discover the possibilities of a more compact pool.",
+      "A new perspective on a day by the pool. Open views, clean edges and a design considered around its setting.",
     features: [
-      "Thoughtful use of a smaller space",
-      "A cooling retreat close to home",
-      "Finishes that connect pool and terrace",
+      "Explore an elevated pool concept",
+      "Structural feasibility assessed first",
+      "Scope and requirements discussed individually",
+    ],
+  },
+  {
+    id: "indoor",
+    title: "Your own quiet world.",
+    type: "Indoor & spa pools",
+    image: "/images/pool-indoor.webp",
+    thumbnail: "/images/pool-indoor-thumb.webp",
+    description:
+      "Deep green mosaic, natural light and warm stone. An indoor pool can become a space to pause, in every season.",
+    features: [
+      "Explore indoor pool possibilities",
+      "Lighting, finishes and atmosphere",
+      "Ventilation and systems planned together",
+    ],
+  },
+  {
+    id: "mosaic",
+    title: "Summer, in full colour.",
+    type: "Blue mosaic pools",
+    image: "/images/pool-mosaic.webp",
+    thumbnail: "/images/pool-mosaic-thumb.webp",
+    description:
+      "Blue mosaic and a softer outline bring a familiar joy to the garden. A pool with colour, character and room to unwind.",
+    features: [
+      "Explore mosaic colours and textures",
+      "Oval shapes and Roman-inspired steps",
+      "A finish palette connected to your garden",
+    ],
+  },
+  {
+    id: "natural",
+    title: "A little closer to nature.",
+    type: "Natural swimming pools",
+    image: "/images/pool-natural.webp",
+    thumbnail: "/images/pool-natural-thumb.webp",
+    description:
+      "Reflective green water, timber and soft planting. A landscape-led direction for a different kind of swimming space.",
+    features: [
+      "Explore a natural pool concept",
+      "Planting and landscape considered together",
+      "Water systems and feasibility discussed first",
     ],
   },
 ];

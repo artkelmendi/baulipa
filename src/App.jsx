@@ -21,6 +21,7 @@ import {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { products, pools, processSteps } from "./data";
+import PerspectiveTunnelHero from "@/components/ui/perspective-tunnel-hero";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -117,50 +118,13 @@ function useChoreography(root, galleryTween) {
     let active = true;
     const ctx = gsap.context(() => {
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Rare first-visit delight: type rises above a waterline, then the image opens upward.
-        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
-        intro
-          .from(".header-brand, .desktop-nav, .header-actions", {
-            opacity: 0,
-            y: -12,
-            duration: 0.65,
-            stagger: 0.06,
-          })
-          .from(
-            ".hero-line > span",
-            { yPercent: 112, rotation: 3, duration: 1.05, stagger: 0.09 },
-            0.15,
-          )
-          .from(".hero-aside", { opacity: 0, y: 24, duration: 0.8 }, 0.4)
-          .fromTo(
-            ".hero-visual",
-            {
-              clipPath:
-                "polygon(0 100%, 25% 96%, 50% 100%, 75% 96%, 100% 100%, 100% 100%, 0 100%)",
-            },
-            {
-              clipPath:
-                "polygon(0 0, 25% 0, 50% 0, 75% 0, 100% 0, 100% 100%, 0 100%)",
-              duration: 1.3,
-              ease: "power3.inOut",
-            },
-            0.15,
-          )
-          .from(
-            ".hero-photo",
-            { scale: 1.15, duration: 1.7, ease: "power2.out" },
-            0.2,
-          );
-
-        gsap.to(".hero-photo", {
-          yPercent: 10,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".hero-visual",
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
+        // Header entrance is independent of the supplied Motion-driven tunnel hero.
+        gsap.from(".header-brand, .desktop-nav, .header-actions", {
+          opacity: 0,
+          y: -12,
+          duration: 0.65,
+          stagger: 0.06,
+          ease: "power3.out",
         });
 
         // Explanation: the statement fills in from left to right, like water finding its level.
@@ -262,7 +226,9 @@ function App() {
   const galleryTween = useRef(null);
   const galleryViewport = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState(() => readSaved("baulipa-theme", "auto"));
+  const [theme, setTheme] = useState(() =>
+    readSaved("baulipa-theme-v2", "light"),
+  );
   const [filter, setFilter] = useState("All essentials");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPool, setSelectedPool] = useState(null);
@@ -281,7 +247,7 @@ function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    save("baulipa-theme", theme);
+    save("baulipa-theme-v2", theme);
   }, [theme]);
   useEffect(() => {
     save("baulipa-enquiry", savedIds);
@@ -321,8 +287,9 @@ function App() {
         Math.min(
           1,
           (direction > 0
-            ? Math.floor(progress * 2 + 0.15) + 1
-            : Math.ceil(progress * 2 - 0.15) - 1) / 2,
+            ? Math.floor(progress * (pools.length - 1) + 0.15) + 1
+            : Math.ceil(progress * (pools.length - 1) - 0.15) - 1) /
+            (pools.length - 1),
         ),
       );
       window.scrollTo({
@@ -390,38 +357,17 @@ function App() {
       </header>
 
       <main id="main">
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-top shell">
-            <h1 id="hero-title">
-              <span className="hero-line">
-                <span>Life looks better</span>
-              </span>
-              <span className="hero-line blue-line">
-                <span>by the water.</span>
-              </span>
-            </h1>
-            <div className="hero-aside">
-              <p>
-                Considered pools. Everyday escapes.
-                <br />
-                Everything for a life by the water.
-              </p>
-              <Action href="#pools">Find your pool</Action>
-            </div>
-          </div>
-          <div className="hero-visual wide-shell">
-            <img
-              className="hero-photo"
-              src="/images/pool-hero.webp"
-              alt="Sunlit turquoise swimming pool beside a contemporary Mediterranean home"
-              width="1672"
-              height="941"
-              fetchPriority="high"
-            />
-          </div>
-        </section>
+        <PerspectiveTunnelHero
+          images={pools}
+          onStartProject={() => openEnquiry()}
+          onSelectPool={setSelectedPool}
+        />
 
-        <section className="intro shell" aria-labelledby="intro-title">
+        <section
+          className="intro shell"
+          id="studio"
+          aria-labelledby="intro-title"
+        >
           <div className="intro-side" data-reveal>
             <span className="eyebrow">
               A little closer to your kind of summer
@@ -570,7 +516,7 @@ function App() {
             </div>
             <div className="process-image">
               <img
-                src="/images/pool-terrace.webp"
+                src="/images/pool-mosaic.webp"
                 alt="Sunlight rippling across beautifully clear swimming pool water"
                 width="1448"
                 height="1086"
@@ -737,8 +683,8 @@ function App() {
             </div>
             <div className="contact-image" data-reveal>
               <img
-                src="/images/pool-compact.webp"
-                alt="A quiet courtyard plunge pool in the afternoon sun"
+                src="/images/pool-white.webp"
+                alt="A sculptural white stone swimming pool with soft curved steps"
                 width="1448"
                 height="1086"
                 loading="lazy"

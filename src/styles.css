@@ -1,3 +1,12 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-primary: var(--blue);
+  --font-sans: "Uncut Sans", Arial, sans-serif;
+}
+
 @font-face {
   font-family: "Uncut Sans";
   src: url("/fonts/UncutSans-Variable.woff2") format("woff2");
@@ -2284,4 +2293,13 @@ h2 {
   .contact-top > div {
     min-width: 0;
   }
+}
+
+/* The tunnel fills the first viewport; navigation floats above its light canvas. */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--paper);
 }

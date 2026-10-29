@@ -1,0 +1,327 @@
+.perspective-hero {
+  height: 200svh;
+  position: relative;
+  background: var(--paper);
+  isolation: isolate;
+}
+.tunnel-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 620px;
+  width: 100%;
+  overflow: hidden;
+  perspective: 1200px;
+  background: var(--paper);
+}
+.tunnel-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--line) 0.65px, transparent 0.65px);
+  background-size: 27px 27px;
+  opacity: 0.55;
+  mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
+  pointer-events: none;
+}
+.tunnel-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.65;
+}
+.tunnel-ring-inner {
+  width: 43vmin;
+  height: 43vmin;
+}
+.tunnel-ring-outer {
+  width: 77vmin;
+  height: 77vmin;
+  border-style: dashed;
+  opacity: 0.5;
+}
+.tunnel-depth-plane {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  perspective: 1200px;
+  z-index: 2;
+  pointer-events: none;
+}
+.tunnel-card-position {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+.tunnel-card {
+  width: 100%;
+  display: block;
+  background: var(--paper);
+  padding: 7px 7px 0;
+  border: 1px solid rgb(23 38 32/0.1);
+  border-radius: 10px;
+  box-shadow: 0 13px 35px rgb(34 64 54/0.13);
+  text-align: left;
+  overflow: hidden;
+  backface-visibility: hidden;
+  transition: box-shadow 0.25s var(--ease-out);
+}
+.tunnel-card img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  border-radius: 5px;
+  transition: transform 0.6s var(--ease-out);
+  user-select: none;
+}
+.tunnel-card-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 6px 12px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+.tunnel-copy-position {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.tunnel-copy {
+  position: relative;
+  text-align: center;
+  padding: 20px 25px 0;
+  max-width: 640px;
+  pointer-events: auto;
+}
+.tunnel-copy:before {
+  content: "";
+  position: absolute;
+  inset: -30px -60px;
+  z-index: -1;
+  background: radial-gradient(ellipse, var(--paper) 35%, transparent 72%);
+  pointer-events: none;
+}
+.tunnel-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 25px;
+}
+.tunnel-copy h1 {
+  font-size: clamp(76px, 8.5vw, 132px);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+  line-height: 0.94;
+}
+.tunnel-copy h1 > span {
+  color: var(--blue);
+}
+.tunnel-description {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 25px;
+  letter-spacing: -0.01em;
+}
+.tunnel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 27px;
+  margin-top: 27px;
+}
+.tunnel-project-link {
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding-block: 8px;
+  white-space: nowrap;
+}
+.tunnel-scroll-link {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 10px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.perspective-hero.is-reduced {
+  height: 100svh;
+  min-height: 620px;
+}
+.is-reduced .tunnel-stage {
+  position: relative;
+}
+.is-reduced .tunnel-card-position,
+.is-reduced .tunnel-copy-position {
+  will-change: auto;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tunnel-card:hover {
+    box-shadow: 0 15px 45px rgb(34 64 54/0.22);
+  }
+  .tunnel-card:hover img {
+    transform: scale(1.04);
+  }
+  .tunnel-project-link:hover {
+    color: var(--blue);
+  }
+}
+@media (max-width: 1023px) {
+  .tunnel-copy h1 {
+    font-size: clamp(70px, 9.5vw, 105px);
+  }
+  .tunnel-copy {
+    max-width: 540px;
+  }
+  .tunnel-card-caption {
+    font-size: 9px;
+    padding: 9px 4px 10px;
+  }
+  .tunnel-copy:before {
+    inset: -30px -35px;
+  }
+  .tunnel-eyebrow {
+    font-size: 9px;
+  }
+  .tunnel-actions {
+    gap: 20px;
+  }
+  .tunnel-project-link {
+    font-size: 11px;
+  }
+}
+@media (max-width: 767px) {
+  .perspective-hero {
+    height: 170svh;
+  }
+  .tunnel-stage {
+    perspective: 900px;
+    min-height: 650px;
+  }
+  .tunnel-depth-plane {
+    perspective: 900px;
+  }
+  .tunnel-copy {
+    padding: 20px 15px 0;
+    max-width: 350px;
+  }
+  .tunnel-copy h1 {
+    font-size: clamp(60px, 15vw, 92px);
+    letter-spacing: -0.07em;
+  }
+  .tunnel-eyebrow {
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    margin-bottom: 20px;
+  }
+  .tunnel-description {
+    font-size: 12px;
+    line-height: 1.65;
+    margin-top: 18px;
+  }
+  .tunnel-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 21px;
+  }
+  .tunnel-actions .action {
+    font-size: 12px;
+    padding-left: 20px;
+    min-height: 46px;
+    gap: 22px;
+  }
+  .tunnel-actions .action-icon {
+    width: 33px;
+    height: 33px;
+  }
+  .tunnel-project-link {
+    font-size: 10px;
+    gap: 6px;
+  }
+  .tunnel-card {
+    padding: 5px 5px 0;
+    border-radius: 7px;
+  }
+  .tunnel-card img {
+    border-radius: 3px;
+    aspect-ratio: 4/3;
+  }
+  .tunnel-card-caption {
+    font-size: 8px;
+    padding: 8px 3px 9px;
+  }
+  .tunnel-card-caption svg {
+    width: 11px;
+  }
+  .tunnel-ring-inner {
+    width: 66vmin;
+    height: 66vmin;
+  }
+  .tunnel-ring-outer {
+    width: 125vmin;
+    height: 125vmin;
+  }
+  .tunnel-copy:before {
+    inset: -20px -18px;
+    background: radial-gradient(ellipse, var(--paper) 42%, transparent 73%);
+  }
+  .tunnel-scroll-link {
+    font-size: 9px;
+    bottom: 19px;
+  }
+  .perspective-hero.is-reduced {
+    height: 100svh;
+    min-height: 650px;
+  }
+}
+@media (max-height: 650px) and (min-width: 768px) {
+  .tunnel-stage {
+    min-height: 560px;
+  }
+  .tunnel-copy h1 {
+    font-size: 80px;
+  }
+  .tunnel-eyebrow {
+    margin-bottom: 15px;
+  }
+  .tunnel-description {
+    margin-top: 17px;
+  }
+  .tunnel-actions {
+    margin-top: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .perspective-hero {
+    height: 100svh;
+  }
+  .tunnel-stage {
+    position: relative;
+  }
+  .tunnel-card img {
+    transition: none;
+  }
+}
