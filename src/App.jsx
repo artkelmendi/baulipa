@@ -150,29 +150,44 @@ function useChoreography(root, galleryTween) {
               0,
             );
           });
-        gsap.from(".process-step", {
-          opacity: 0,
-          y: 30,
-          stagger: 0.12,
-          duration: 0.85,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".process-steps",
-            start: "top 85%",
-            once: true,
-          },
+        const planning = gsap.timeline({
+          defaults: { ease: "power3.out" },
+          scrollTrigger: { trigger: ".process", start: "top 78%", once: true },
         });
-        gsap.utils
-          .toArray(".shop-header h2, .contact h2")
-          .forEach((el) =>
-            gsap.from(el, {
-              clipPath: "inset(0 0 100% 0)",
-              y: 30,
+        planning
+          .from(".process-title .plan-line > span", {
+            yPercent: 110,
+            duration: 0.9,
+            stagger: 0.075,
+          })
+          .from(".process-title p", { opacity: 0, y: 18, duration: 0.7 }, 0.3)
+          .from(
+            ".process-image",
+            {
+              clipPath: "inset(0 100% 0 0)",
               duration: 1,
-              ease: "power3.out",
-              scrollTrigger: { trigger: el, start: "top 90%", once: true },
-            }),
+              ease: "power3.inOut",
+            },
+            0.15,
           );
+        gsap.utils.toArray(".process-step, .process-end").forEach((el) => {
+          gsap.from(el, {
+            opacity: 0,
+            y: 24,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 90%", once: true },
+          });
+        });
+        gsap.utils.toArray(".shop-header h2, .contact h2").forEach((el) =>
+          gsap.from(el, {
+            clipPath: "inset(0 0 100% 0)",
+            y: 30,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 90%", once: true },
+          }),
+        );
         // Header entrance is independent of the supplied Motion-driven tunnel hero.
         gsap.from(".header-brand, .desktop-nav, .header-actions", {
           opacity: 0,
@@ -239,18 +254,28 @@ function useChoreography(root, galleryTween) {
         () => {
           const track = root.current.querySelector(".pool-track");
           const viewport = root.current.querySelector(".pool-viewport");
-          // Spatial consistency: one continuous track preserves the relationship between pool styles.
+          const section = root.current.querySelector(".pool-gallery");
+          const distance = () =>
+            Math.max(
+              0,
+              track.offsetWidth +
+                parseFloat(getComputedStyle(viewport).paddingLeft) -
+                viewport.clientWidth,
+            );
+          const sizeRunway = () =>
+            section.style.setProperty("--gallery-travel", `${distance()}px`);
+          sizeRunway();
+          // Native sticky positioning releases naturally; only the image track is scrubbed.
           galleryTween.current = gsap.to(track, {
-            x: () => -(track.scrollWidth - viewport.clientWidth),
+            x: () => -distance(),
             ease: "none",
             scrollTrigger: {
               trigger: ".pool-gallery",
               start: "top top",
-              end: () => `+=${track.scrollWidth - viewport.clientWidth}`,
-              pin: true,
-              scrub: 1,
-              anticipatePin: 1,
+              end: "bottom bottom",
+              scrub: true,
               invalidateOnRefresh: true,
+              onRefreshInit: sizeRunway,
             },
           });
           gsap.utils.toArray(".pool-card").forEach((card) => {
@@ -272,6 +297,7 @@ function useChoreography(root, galleryTween) {
           });
           return () => {
             galleryTween.current = null;
+            section.style.removeProperty("--gallery-travel");
           };
         },
       );
@@ -280,13 +306,9 @@ function useChoreography(root, galleryTween) {
       if (active) ScrollTrigger.refresh();
     };
     document.fonts.ready.then(refresh);
-    const images = Array.from(root.current.querySelectorAll("img"));
-    images.forEach((img) =>
-      img.addEventListener("load", refresh, { once: true }),
-    );
+    // Images have reserved dimensions, so lazy loads do not need to rebuild scroll geometry.
     return () => {
       active = false;
-      images.forEach((img) => img.removeEventListener("load", refresh));
       media.revert();
       ctx.revert();
     };
@@ -576,74 +598,79 @@ function App() {
               id="pools"
               aria-labelledby="pools-title"
             >
-              <div className="gallery-heading shell">
-                <div>
-                  <h2 id="pools-title">
-                    Your own little
-                    <br />
-                    <span className="muted">piece of summer.</span>
-                  </h2>
+              <div className="gallery-stage">
+                <div className="gallery-heading shell">
+                  <div>
+                    <h2 id="pools-title">
+                      Your own little
+                      <br />
+                      <span className="muted">piece of summer.</span>
+                    </h2>
+                  </div>
+                  <div className="gallery-controls">
+                    <button
+                      className="icon-button outlined"
+                      onClick={() => moveGallery(-1)}
+                      aria-label="Previous pool style"
+                    >
+                      <ArrowLeft size={23} />
+                    </button>
+                    <button
+                      className="icon-button outlined"
+                      onClick={() => moveGallery(1)}
+                      aria-label="Next pool style"
+                    >
+                      <ArrowRight size={23} />
+                    </button>
+                  </div>
                 </div>
-                <div className="gallery-controls">
-                  <button
-                    className="icon-button outlined"
-                    onClick={() => moveGallery(-1)}
-                    aria-label="Previous pool style"
-                  >
-                    <ArrowLeft size={23} />
-                  </button>
-                  <button
-                    className="icon-button outlined"
-                    onClick={() => moveGallery(1)}
-                    aria-label="Next pool style"
-                  >
-                    <ArrowRight size={23} />
-                  </button>
+                <div
+                  className="pool-viewport"
+                  ref={galleryViewport}
+                  tabIndex="0"
+                  aria-label="Pool styles gallery. Use the arrow buttons to explore."
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === "ArrowRight" ||
+                      event.key === "ArrowLeft"
+                    ) {
+                      event.preventDefault();
+                      moveGallery(event.key === "ArrowRight" ? 1 : -1);
+                    }
+                  }}
+                >
+                  <div className="pool-track">
+                    {pools.map((pool) => (
+                      <article className="pool-card" key={pool.id}>
+                        <button
+                          className="pool-card-image"
+                          onClick={() => setSelectedPool(pool)}
+                          aria-label={`Discover ${pool.type}`}
+                        >
+                          <img
+                            src={pool.image}
+                            alt={`${pool.type}: ${pool.title}`}
+                            width="1448"
+                            height="1086"
+                            loading="eager"
+                          />
+                          <span className="image-arrow">
+                            <ArrowUpRight size={28} />
+                          </span>
+                        </button>
+                        <div className="pool-caption">
+                          <h3>{pool.title}</h3>
+                          <span>{pool.type}</span>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
                 </div>
+                <p className="gallery-note shell">
+                  A world of possibilities, shaped around your space.{" "}
+                  <span>Concept imagery for inspiration.</span>
+                </p>
               </div>
-              <div
-                className="pool-viewport"
-                ref={galleryViewport}
-                tabIndex="0"
-                aria-label="Pool styles gallery. Use the arrow buttons to explore."
-                onKeyDown={(event) => {
-                  if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-                    event.preventDefault();
-                    moveGallery(event.key === "ArrowRight" ? 1 : -1);
-                  }
-                }}
-              >
-                <div className="pool-track">
-                  {pools.map((pool) => (
-                    <article className="pool-card" key={pool.id}>
-                      <button
-                        className="pool-card-image"
-                        onClick={() => setSelectedPool(pool)}
-                        aria-label={`Discover ${pool.type}`}
-                      >
-                        <img
-                          src={pool.image}
-                          alt={`${pool.type}: ${pool.title}`}
-                          width="1448"
-                          height="1086"
-                          loading="lazy"
-                        />
-                        <span className="image-arrow">
-                          <ArrowUpRight size={28} />
-                        </span>
-                      </button>
-                      <div className="pool-caption">
-                        <h3>{pool.title}</h3>
-                        <span>{pool.type}</span>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-              <p className="gallery-note shell">
-                A world of possibilities, shaped around your space.{" "}
-                <span>Concept imagery for inspiration.</span>
-              </p>
             </section>
 
             <section
@@ -652,13 +679,17 @@ function App() {
               aria-labelledby="process-title"
             >
               <div className="process-visual">
-                <div className="process-title" data-reveal>
+                <div className="process-title">
                   <h2 id="process-title">
-                    Good things
-                    <br />
-                    start with
-                    <br />
-                    <span className="blue">a clear plan.</span>
+                    <span className="plan-line">
+                      <span>Good things</span>
+                    </span>
+                    <span className="plan-line">
+                      <span>start with</span>
+                    </span>
+                    <span className="plan-line blue">
+                      <span>a clear plan.</span>
+                    </span>
                   </h2>
                   <p>
                     Your ideas, our attention to detail.
@@ -683,7 +714,7 @@ function App() {
                   />
                 </div>
               </div>
-              <div className="process-steps" data-reveal>
+              <div className="process-steps">
                 {processSteps.map((item, i) => (
                   <div
                     className={`process-step ${step === i ? "is-open" : ""}`}
@@ -697,18 +728,26 @@ function App() {
                         onClick={() => setStep(step === i ? -1 : i)}
                       >
                         <span>{item.title}</span>
-                        {step === i ? <Minus size={23} /> : <Plus size={23} />}
+                        <span className="step-indicator" aria-hidden="true">
+                          <span />
+                          <span />
+                        </span>
                       </button>
                     </h3>
                     <div
-                      className="step-content"
+                      className="step-panel"
                       id={`step-${i}`}
                       role="region"
                       aria-labelledby={`step-button-${i}`}
-                      hidden={step !== i}
+                      aria-hidden={step !== i}
+                      inert={step !== i}
                     >
-                      <p>{item.text}</p>
-                      <span>{item.tag}</span>
+                      <div className="step-clip">
+                        <div className="step-content">
+                          <p>{item.text}</p>
+                          <span>{item.tag}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}

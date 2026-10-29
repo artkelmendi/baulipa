@@ -131,6 +131,7 @@
   line-height: 0.94;
 }
 .tunnel-copy h1 > span {
+  color: var(--blue);
   font-weight: 650;
 }
 [data-theme="dark"] .tunnel-copy h1 {

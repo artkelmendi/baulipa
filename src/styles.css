@@ -476,7 +476,6 @@ h2 {
 .pool-card-image img {
   width: 100%;
   height: 100%;
-  transition: transform 0.8s var(--ease-out);
 }
 .pool-card-image .image-arrow {
   position: absolute;
@@ -519,9 +518,27 @@ h2 {
   font-size: 10px;
 }
 @media (min-width: 1024px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
+  .pool-gallery#pools {
+    overflow: clip;
+    padding: 0;
+    height: calc(100svh + var(--gallery-travel, 0px));
+  }
+  .gallery-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 28px;
+  }
   .pool-viewport {
-    overflow: visible;
+    overflow: clip;
     scroll-snap-type: none;
+    flex-shrink: 0;
+  }
+  .pool-track {
+    will-change: transform;
   }
   .pool-card {
     scroll-snap-align: none;
@@ -535,6 +552,15 @@ h2 {
 }
 .process-title h2 {
   font-size: clamp(48px, 4.8vw, 74px);
+}
+.plan-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.plan-line > span {
+  display: block;
 }
 .process-title p {
   font-size: 14px;
@@ -594,6 +620,56 @@ h2 {
 }
 .process-step.is-open h3 > button {
   color: var(--blue);
+}
+.step-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 240ms var(--ease-out),
+    opacity 180ms var(--ease-out);
+}
+.process-step.is-open .step-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.step-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+.step-content {
+  transform: translateY(-8px);
+  transition: transform 240ms var(--ease-out);
+}
+.is-open .step-content {
+  transform: translateY(0);
+}
+.step-indicator {
+  position: relative;
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+}
+.step-indicator > span {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 11px;
+  height: 1px;
+  background: currentColor;
+}
+.step-indicator > span:last-child {
+  transform: rotate(90deg) scaleX(1);
+  transition: transform 240ms var(--ease-out);
+}
+.is-open .step-indicator > span:last-child {
+  transform: rotate(90deg) scaleX(0);
+}
+.process-step h3 > button > span:first-child {
+  transition: transform 160ms var(--ease-out);
+}
+.process-step h3 > button:active > span:first-child {
+  transform: translateX(4px);
 }
 .step-content {
   padding: 0 35px 30px 0;
