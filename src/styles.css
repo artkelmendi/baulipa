@@ -2303,3 +2303,8 @@ h2 {
   right: 0;
   background: var(--paper);
 }
+
+/* Restore native dialog centering after the CSS reset. */
+.dialog { inset: 0; margin: auto; }
+.questions-list details { overflow: hidden; }
+

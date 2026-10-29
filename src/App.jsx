@@ -250,6 +250,31 @@ function App() {
   useChoreography(root, galleryTween);
 
   useEffect(() => {
+    const items = Array.from(document.querySelectorAll('.questions-list details'));
+    const handlers = items.map(item => {
+      const summary = item.querySelector('summary');
+      const answer = item.querySelector('p');
+      let animation;
+      let closing = false;
+      const click = event => {
+        event.preventDefault();
+        const from = item.getBoundingClientRect().height;
+        const willOpen = !item.open || closing;
+        animation?.cancel();
+        closing = !willOpen;
+        item.open = true;
+        const to = willOpen ? summary.getBoundingClientRect().height + answer.getBoundingClientRect().height : summary.getBoundingClientRect().height;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) { item.open = willOpen; return; }
+        animation = item.animate([{height: `${from}px`}, {height: `${to}px`}], {duration: 240, easing: 'cubic-bezier(.23,1,.32,1)'});
+        animation.onfinish = () => { item.open = willOpen; closing = false; animation = null; };
+      };
+      summary.addEventListener('click', click);
+      return () => { animation?.cancel(); summary.removeEventListener('click', click); };
+    });
+    return () => handlers.forEach(cleanup => cleanup());
+  }, []);
+
+  useEffect(() => {
     const targetId = window.location.hash.slice(1);
     if (!targetId) return;
     let active = true;
