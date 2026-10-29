@@ -23,6 +23,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { products, pools, processSteps } from "./data";
 import PerspectiveTunnelHero from "@/components/ui/perspective-tunnel-hero";
 import WaterReflections from "@/components/ui/water-reflections";
+import ProductPage from "./components/ProductPage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -115,6 +116,7 @@ function Dialog({ open, onClose, titleId, className = "", children }) {
 
 function useChoreography(root, galleryTween) {
   useLayoutEffect(() => {
+    if (window.location.pathname.startsWith("/products")) return;
     const media = gsap.matchMedia();
     let active = true;
     const ctx = gsap.context(() => {
@@ -223,6 +225,7 @@ function useChoreography(root, galleryTween) {
 }
 
 function App() {
+  const isProductsPage = window.location.pathname.startsWith("/products");
   // Trial switch: ?water=off#contact shows the exact invitation without the effect.
   const waterReflectionsEnabled =
     new URLSearchParams(window.location.search).get("water") !== "off";
@@ -250,28 +253,46 @@ function App() {
   useChoreography(root, galleryTween);
 
   useEffect(() => {
-    const items = Array.from(document.querySelectorAll('.questions-list details'));
-    const handlers = items.map(item => {
-      const summary = item.querySelector('summary');
-      const answer = item.querySelector('p');
+    const items = Array.from(
+      document.querySelectorAll(".questions-list details"),
+    );
+    const handlers = items.map((item) => {
+      const summary = item.querySelector("summary");
+      const answer = item.querySelector("p");
       let animation;
       let closing = false;
-      const click = event => {
+      const click = (event) => {
         event.preventDefault();
         const from = item.getBoundingClientRect().height;
         const willOpen = !item.open || closing;
         animation?.cancel();
         closing = !willOpen;
         item.open = true;
-        const to = willOpen ? summary.getBoundingClientRect().height + answer.getBoundingClientRect().height : summary.getBoundingClientRect().height;
-        if (matchMedia('(prefers-reduced-motion: reduce)').matches) { item.open = willOpen; return; }
-        animation = item.animate([{height: `${from}px`}, {height: `${to}px`}], {duration: 240, easing: 'cubic-bezier(.23,1,.32,1)'});
-        animation.onfinish = () => { item.open = willOpen; closing = false; animation = null; };
+        const to = willOpen
+          ? summary.getBoundingClientRect().height +
+            answer.getBoundingClientRect().height
+          : summary.getBoundingClientRect().height;
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          item.open = willOpen;
+          return;
+        }
+        animation = item.animate(
+          [{ height: `${from}px` }, { height: `${to}px` }],
+          { duration: 240, easing: "cubic-bezier(.23,1,.32,1)" },
+        );
+        animation.onfinish = () => {
+          item.open = willOpen;
+          closing = false;
+          animation = null;
+        };
       };
-      summary.addEventListener('click', click);
-      return () => { animation?.cancel(); summary.removeEventListener('click', click); };
+      summary.addEventListener("click", click);
+      return () => {
+        animation?.cancel();
+        summary.removeEventListener("click", click);
+      };
     });
-    return () => handlers.forEach(cleanup => cleanup());
+    return () => handlers.forEach((cleanup) => cleanup());
   }, []);
 
   useEffect(() => {
@@ -365,13 +386,13 @@ function App() {
         Skip to content
       </a>
       <header className="header shell">
-        <a className="header-brand wordmark" href="#" aria-label="BAULIPA home">
+        <a className="header-brand wordmark" href="/" aria-label="BAULIPA home">
           baulipa<span className="brand-period">.</span>
         </a>
         <nav className="desktop-nav" aria-label="Main navigation">
-          <a href="#pools">Our pools</a>
-          <a href="#approach">Our approach</a>
-          <a href="#shop">
+          <a href="/#pools">Our pools</a>
+          <a href="/#approach">Our approach</a>
+          <a href="/products/">
             Pool shop <ArrowUpRight size={14} />
           </a>
         </nav>
@@ -406,397 +427,420 @@ function App() {
       </header>
 
       <main id="main">
-        <PerspectiveTunnelHero
-          images={pools}
-          onStartProject={() => openEnquiry()}
-          onSelectPool={setSelectedPool}
-        />
+        {isProductsPage ? (
+          <ProductPage
+            savedIds={savedIds}
+            onAdd={addProduct}
+            onEnquiry={openEnquiry}
+          />
+        ) : (
+          <>
+            <PerspectiveTunnelHero
+              images={pools}
+              onStartProject={() => openEnquiry()}
+              onSelectPool={setSelectedPool}
+            />
 
-        <section
-          className="intro shell"
-          id="studio"
-          aria-labelledby="intro-title"
-        >
-          <div className="intro-side" data-reveal>
-            <span className="eyebrow">
-              A little closer to your kind of summer
-            </span>
-            <p>
-              Swimming pools, thoughtfully built.
-              <br />
-              From the first sketch to the everyday details.
-            </p>
-            <a className="text-link" href="#approach">
-              Meet our approach <ArrowDown size={18} />
-            </a>
-          </div>
-          <div
-            className="manifesto"
-            id="intro-title"
-            role="heading"
-            aria-level="2"
-            aria-label="More than a pool. A place to feel good."
-          >
-            {["More than a pool.", "A place to", "feel good."].map(
-              (text, i) => (
-                <div
-                  className={`manifesto-line manifesto-line-${i}`}
-                  key={text}
-                  aria-hidden="true"
-                >
-                  <span>{text}</span>
-                  <span className="manifesto-fill">{text}</span>
-                </div>
-              ),
-            )}
-          </div>
-          <div className="service-strip" data-reveal>
-            <a href="#pools">
-              <Waves size={27} weight="light" />
-              <span>Made for your space</span>
-              <ArrowUpRight size={19} />
-            </a>
-            <a href="#approach">
-              <PencilRuler size={27} weight="light" />
-              <span>Built with consideration</span>
-              <ArrowUpRight size={19} />
-            </a>
-            <a href="#shop">
-              <Sun size={27} weight="light" />
-              <span>Ready for every summer</span>
-              <ArrowUpRight size={19} />
-            </a>
-          </div>
-        </section>
-
-        <section
-          className="pool-gallery"
-          id="pools"
-          aria-labelledby="pools-title"
-        >
-          <div className="gallery-heading shell">
-            <div>
-              <h2 id="pools-title">
-                Your own little
-                <br />
-                <span className="muted">piece of summer.</span>
-              </h2>
-            </div>
-            <div className="gallery-controls">
-              <button
-                className="icon-button outlined"
-                onClick={() => moveGallery(-1)}
-                aria-label="Previous pool style"
-              >
-                <ArrowLeft size={23} />
-              </button>
-              <button
-                className="icon-button outlined"
-                onClick={() => moveGallery(1)}
-                aria-label="Next pool style"
-              >
-                <ArrowRight size={23} />
-              </button>
-            </div>
-          </div>
-          <div
-            className="pool-viewport"
-            ref={galleryViewport}
-            tabIndex="0"
-            aria-label="Pool styles gallery. Use the arrow buttons to explore."
-            onKeyDown={(event) => {
-              if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-                event.preventDefault();
-                moveGallery(event.key === "ArrowRight" ? 1 : -1);
-              }
-            }}
-          >
-            <div className="pool-track">
-              {pools.map((pool) => (
-                <article className="pool-card" key={pool.id}>
-                  <button
-                    className="pool-card-image"
-                    onClick={() => setSelectedPool(pool)}
-                    aria-label={`Discover ${pool.type}`}
-                  >
-                    <img
-                      src={pool.image}
-                      alt={`${pool.type}: ${pool.title}`}
-                      width="1448"
-                      height="1086"
-                      loading="lazy"
-                    />
-                    <span className="image-arrow">
-                      <ArrowUpRight size={28} />
-                    </span>
-                  </button>
-                  <div className="pool-caption">
-                    <h3>{pool.title}</h3>
-                    <span>{pool.type}</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-          <p className="gallery-note shell">
-            A world of possibilities, shaped around your space.{" "}
-            <span>Concept imagery for inspiration.</span>
-          </p>
-        </section>
-
-        <section
-          className="process shell"
-          id="approach"
-          aria-labelledby="process-title"
-        >
-          <div className="process-visual">
-            <div className="process-title" data-reveal>
-              <h2 id="process-title">
-                Good things
-                <br />
-                start with
-                <br />
-                <span className="blue">a clear plan.</span>
-              </h2>
-              <p>
-                Your ideas, our attention to detail.
-                <br />A considered journey to your first dive.
-              </p>
-            </div>
-            <div className="process-image">
-              <img
-                src="/images/pool-mosaic.webp"
-                alt="Sunlight rippling across beautifully clear swimming pool water"
-                width="1448"
-                height="1086"
-                loading="lazy"
-              />
-              <span className="image-ripple ripple-one" aria-hidden="true" />
-              <span className="image-ripple ripple-two" aria-hidden="true" />
-            </div>
-          </div>
-          <div className="process-steps" data-reveal>
-            {processSteps.map((item, i) => (
-              <div
-                className={`process-step ${step === i ? "is-open" : ""}`}
-                key={item.title}
-              >
-                <h3>
-                  <button
-                    aria-expanded={step === i}
-                    aria-controls={`step-${i}`}
-                    id={`step-button-${i}`}
-                    onClick={() => setStep(step === i ? -1 : i)}
-                  >
-                    <span>{item.title}</span>
-                    {step === i ? <Minus size={23} /> : <Plus size={23} />}
-                  </button>
-                </h3>
-                <div
-                  className="step-content"
-                  id={`step-${i}`}
-                  role="region"
-                  aria-labelledby={`step-button-${i}`}
-                  hidden={step !== i}
-                >
-                  <p>{item.text}</p>
-                  <span>{item.tag}</span>
-                </div>
+            <section
+              className="intro shell"
+              id="studio"
+              aria-labelledby="intro-title"
+            >
+              <div className="intro-side" data-reveal>
+                <span className="eyebrow">
+                  A little closer to your kind of summer
+                </span>
+                <p>
+                  Swimming pools, thoughtfully built.
+                  <br />
+                  From the first sketch to the everyday details.
+                </p>
+                <a className="text-link" href="/#approach">
+                  Meet our approach <ArrowDown size={18} />
+                </a>
               </div>
-            ))}
-            <div className="process-end">
-              <Waves size={31} weight="light" />
-              <p>
-                Built around your home.
-                <br />
-                Designed around your life.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="shop" id="shop" aria-labelledby="shop-title">
-          <div className="shop-header shell">
-            <div>
-              <span className="eyebrow">The pool shop</span>
-              <h2 id="shop-title">
-                Good water.
-                <br />
-                Great essentials.
-              </h2>
-              <p>The details that keep your pool at its best.</p>
-            </div>
-            <a className="text-link" href="#collection">
-              Explore the collection <ArrowDown size={19} />
-            </a>
-          </div>
-          <div className="shop-collection shell" id="collection">
-            <div className="shop-toolbar">
               <div
-                className="filters"
-                role="group"
-                aria-label="Filter products by category"
+                className="manifesto"
+                id="intro-title"
+                role="heading"
+                aria-level="2"
+                aria-label="More than a pool. A place to feel good."
               >
-                {["All essentials", "Cleaning", "Water care", "Equipment"].map(
-                  (name) => (
-                    <button
-                      key={name}
-                      className={filter === name ? "active" : ""}
-                      aria-pressed={filter === name}
-                      onClick={() => setFilter(name)}
+                {["More than a pool.", "A place to", "feel good."].map(
+                  (text, i) => (
+                    <div
+                      className={`manifesto-line manifesto-line-${i}`}
+                      key={text}
+                      aria-hidden="true"
                     >
-                      {name}
-                      {name === "All essentials" && <sup>04</sup>}
-                    </button>
+                      <span>{text}</span>
+                      <span className="manifesto-fill">{text}</span>
+                    </div>
                   ),
                 )}
               </div>
-              <span className="product-count" role="status">
-                {visibleProducts.length}{" "}
-                {visibleProducts.length === 1 ? "product" : "products"}
-              </span>
-            </div>
-            <div className="product-grid">
-              {visibleProducts.map((product) => (
-                <article className="product-card" key={product.id}>
-                  <div className="product-image">
-                    <button
-                      className="product-image-link"
-                      onClick={() => setSelectedProduct(product)}
-                      aria-label={`View ${product.name}`}
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        width="850"
-                        height="850"
-                        loading="lazy"
-                      />
-                    </button>
-                    <button
-                      className={`add-product ${savedIds.includes(product.id) ? "is-saved" : ""}`}
-                      aria-label={
-                        savedIds.includes(product.id)
-                          ? `${product.name} is in enquiry list`
-                          : `Add ${product.name} to enquiry list`
-                      }
-                      onClick={() => addProduct(product.id)}
-                    >
-                      {savedIds.includes(product.id) ? (
-                        <Check size={20} />
-                      ) : (
-                        <Plus size={20} />
-                      )}
-                    </button>
-                  </div>
-                  <span className="product-category">{product.category}</span>
-                  <h3>
-                    <button onClick={() => setSelectedProduct(product)}>
-                      {product.name}
-                      <ArrowUpRight size={19} />
-                    </button>
-                  </h3>
-                  <p>Price on request</p>
-                </article>
-              ))}
-            </div>
-            <div className="shop-bottom">
-              <p>
-                Collection preview. Ask us about models, compatibility and
-                availability.
-              </p>
-              <button
-                className="text-link"
-                onClick={() => openEnquiry("Help choosing pool products")}
-              >
-                A little advice? <ArrowUpRight size={19} />
-              </button>
-            </div>
-          </div>
-        </section>
+              <div className="service-strip" data-reveal>
+                <a href="/#pools">
+                  <Waves size={27} weight="light" />
+                  <span>Made for your space</span>
+                  <ArrowUpRight size={19} />
+                </a>
+                <a href="/#approach">
+                  <PencilRuler size={27} weight="light" />
+                  <span>Built with consideration</span>
+                  <ArrowUpRight size={19} />
+                </a>
+                <a href="/products/">
+                  <Sun size={27} weight="light" />
+                  <span>Ready for every summer</span>
+                  <ArrowUpRight size={19} />
+                </a>
+              </div>
+            </section>
 
-        <section
-          className="contact shell"
-          id="contact"
-          aria-labelledby="contact-title"
-        >
-          <div
-            className={`contact-top ${waterReflectionsEnabled ? "has-water-reflections" : ""}`}
-          >
-            {waterReflectionsEnabled && <WaterReflections />}
-            <div data-reveal>
-              <p>You bring the daydream.</p>
-              <h2 id="contact-title">
-                Let’s make
-                <br />
-                <span className="blue">a splash.</span>
-              </h2>
-              <Action onClick={() => openEnquiry()}>Start your project</Action>
-            </div>
-            <div className="contact-image" data-reveal>
-              <img
-                src="/images/pool-white.webp"
-                alt="A sculptural white stone swimming pool with soft curved steps"
-                width="1448"
-                height="1086"
-                loading="lazy"
-              />
-            </div>
-          </div>
-          <div className="questions" data-reveal>
-            <h3>
-              A few things
-              <br />
-              you might be wondering.
-            </h3>
-            <div className="questions-list">
-              <details>
-                <summary>
-                  Where do we start?
-                  <Plus size={19} />
-                </summary>
-                <p>
-                  Start with your space and an idea of how you would like to use
-                  it. Photos, rough measurements and an initial budget are a
-                  useful beginning.
-                </p>
-              </details>
-              <details>
-                <summary>
-                  Can you help with an existing pool?
-                  <Plus size={19} />
-                </summary>
-                <p>
-                  Tell us about your pool and what you want to change. We can
-                  discuss products, equipment and the scope of any work with
-                  you.
-                </p>
-              </details>
-              <details>
-                <summary>
-                  How do I find the right pool products?
-                  <Plus size={19} />
-                </summary>
-                <p>
-                  Save the products that interest you to your enquiry list.
-                  Include your pool dimensions and equipment details so we can
-                  help you check compatibility.
-                </p>
-              </details>
-            </div>
-          </div>
-        </section>
+            <section
+              className="pool-gallery"
+              id="pools"
+              aria-labelledby="pools-title"
+            >
+              <div className="gallery-heading shell">
+                <div>
+                  <h2 id="pools-title">
+                    Your own little
+                    <br />
+                    <span className="muted">piece of summer.</span>
+                  </h2>
+                </div>
+                <div className="gallery-controls">
+                  <button
+                    className="icon-button outlined"
+                    onClick={() => moveGallery(-1)}
+                    aria-label="Previous pool style"
+                  >
+                    <ArrowLeft size={23} />
+                  </button>
+                  <button
+                    className="icon-button outlined"
+                    onClick={() => moveGallery(1)}
+                    aria-label="Next pool style"
+                  >
+                    <ArrowRight size={23} />
+                  </button>
+                </div>
+              </div>
+              <div
+                className="pool-viewport"
+                ref={galleryViewport}
+                tabIndex="0"
+                aria-label="Pool styles gallery. Use the arrow buttons to explore."
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+                    event.preventDefault();
+                    moveGallery(event.key === "ArrowRight" ? 1 : -1);
+                  }
+                }}
+              >
+                <div className="pool-track">
+                  {pools.map((pool) => (
+                    <article className="pool-card" key={pool.id}>
+                      <button
+                        className="pool-card-image"
+                        onClick={() => setSelectedPool(pool)}
+                        aria-label={`Discover ${pool.type}`}
+                      >
+                        <img
+                          src={pool.image}
+                          alt={`${pool.type}: ${pool.title}`}
+                          width="1448"
+                          height="1086"
+                          loading="lazy"
+                        />
+                        <span className="image-arrow">
+                          <ArrowUpRight size={28} />
+                        </span>
+                      </button>
+                      <div className="pool-caption">
+                        <h3>{pool.title}</h3>
+                        <span>{pool.type}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              <p className="gallery-note shell">
+                A world of possibilities, shaped around your space.{" "}
+                <span>Concept imagery for inspiration.</span>
+              </p>
+            </section>
+
+            <section
+              className="process shell"
+              id="approach"
+              aria-labelledby="process-title"
+            >
+              <div className="process-visual">
+                <div className="process-title" data-reveal>
+                  <h2 id="process-title">
+                    Good things
+                    <br />
+                    start with
+                    <br />
+                    <span className="blue">a clear plan.</span>
+                  </h2>
+                  <p>
+                    Your ideas, our attention to detail.
+                    <br />A considered journey to your first dive.
+                  </p>
+                </div>
+                <div className="process-image">
+                  <img
+                    src="/images/pool-mosaic.webp"
+                    alt="Sunlight rippling across beautifully clear swimming pool water"
+                    width="1448"
+                    height="1086"
+                    loading="lazy"
+                  />
+                  <span
+                    className="image-ripple ripple-one"
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="image-ripple ripple-two"
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+              <div className="process-steps" data-reveal>
+                {processSteps.map((item, i) => (
+                  <div
+                    className={`process-step ${step === i ? "is-open" : ""}`}
+                    key={item.title}
+                  >
+                    <h3>
+                      <button
+                        aria-expanded={step === i}
+                        aria-controls={`step-${i}`}
+                        id={`step-button-${i}`}
+                        onClick={() => setStep(step === i ? -1 : i)}
+                      >
+                        <span>{item.title}</span>
+                        {step === i ? <Minus size={23} /> : <Plus size={23} />}
+                      </button>
+                    </h3>
+                    <div
+                      className="step-content"
+                      id={`step-${i}`}
+                      role="region"
+                      aria-labelledby={`step-button-${i}`}
+                      hidden={step !== i}
+                    >
+                      <p>{item.text}</p>
+                      <span>{item.tag}</span>
+                    </div>
+                  </div>
+                ))}
+                <div className="process-end">
+                  <Waves size={31} weight="light" />
+                  <p>
+                    Built around your home.
+                    <br />
+                    Designed around your life.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="shop" id="shop" aria-labelledby="shop-title">
+              <div className="shop-header shell">
+                <div>
+                  <span className="eyebrow">The pool shop</span>
+                  <h2 id="shop-title">
+                    Good water.
+                    <br />
+                    Great essentials.
+                  </h2>
+                  <p>The details that keep your pool at its best.</p>
+                </div>
+                <a className="text-link" href="#collection">
+                  Explore the collection <ArrowDown size={19} />
+                </a>
+              </div>
+              <div className="shop-collection shell" id="collection">
+                <div className="shop-toolbar">
+                  <div
+                    className="filters"
+                    role="group"
+                    aria-label="Filter products by category"
+                  >
+                    {[
+                      "All essentials",
+                      "Cleaning",
+                      "Water care",
+                      "Equipment",
+                    ].map((name) => (
+                      <button
+                        key={name}
+                        className={filter === name ? "active" : ""}
+                        aria-pressed={filter === name}
+                        onClick={() => setFilter(name)}
+                      >
+                        {name}
+                        {name === "All essentials" && <sup>04</sup>}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="product-count" role="status">
+                    {visibleProducts.length}{" "}
+                    {visibleProducts.length === 1 ? "product" : "products"}
+                  </span>
+                </div>
+                <div className="product-grid">
+                  {visibleProducts.map((product) => (
+                    <article className="product-card" key={product.id}>
+                      <div className="product-image">
+                        <button
+                          className="product-image-link"
+                          onClick={() => setSelectedProduct(product)}
+                          aria-label={`View ${product.name}`}
+                        >
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            width="850"
+                            height="850"
+                            loading="lazy"
+                          />
+                        </button>
+                        <button
+                          className={`add-product ${savedIds.includes(product.id) ? "is-saved" : ""}`}
+                          aria-label={
+                            savedIds.includes(product.id)
+                              ? `${product.name} is in enquiry list`
+                              : `Add ${product.name} to enquiry list`
+                          }
+                          onClick={() => addProduct(product.id)}
+                        >
+                          {savedIds.includes(product.id) ? (
+                            <Check size={20} />
+                          ) : (
+                            <Plus size={20} />
+                          )}
+                        </button>
+                      </div>
+                      <span className="product-category">
+                        {product.category}
+                      </span>
+                      <h3>
+                        <button onClick={() => setSelectedProduct(product)}>
+                          {product.name}
+                          <ArrowUpRight size={19} />
+                        </button>
+                      </h3>
+                      <p>Price on request</p>
+                    </article>
+                  ))}
+                </div>
+                <div className="shop-bottom">
+                  <p>
+                    Collection preview. Ask us about models, compatibility and
+                    availability.
+                  </p>
+                  <button
+                    className="text-link"
+                    onClick={() => openEnquiry("Help choosing pool products")}
+                  >
+                    A little advice? <ArrowUpRight size={19} />
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section
+              className="contact shell"
+              id="contact"
+              aria-labelledby="contact-title"
+            >
+              <div
+                className={`contact-top ${waterReflectionsEnabled ? "has-water-reflections" : ""}`}
+              >
+                {waterReflectionsEnabled && <WaterReflections />}
+                <div data-reveal>
+                  <p>You bring the daydream.</p>
+                  <h2 id="contact-title">
+                    Let’s make
+                    <br />
+                    <span className="blue">a splash.</span>
+                  </h2>
+                  <Action onClick={() => openEnquiry()}>
+                    Start your project
+                  </Action>
+                </div>
+                <div className="contact-image" data-reveal>
+                  <img
+                    src="/images/pool-white.webp"
+                    alt="A sculptural white stone swimming pool with soft curved steps"
+                    width="1448"
+                    height="1086"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div className="questions" data-reveal>
+                <h3>
+                  A few things
+                  <br />
+                  you might be wondering.
+                </h3>
+                <div className="questions-list">
+                  <details>
+                    <summary>
+                      Where do we start?
+                      <Plus size={19} />
+                    </summary>
+                    <p>
+                      Start with your space and an idea of how you would like to
+                      use it. Photos, rough measurements and an initial budget
+                      are a useful beginning.
+                    </p>
+                  </details>
+                  <details>
+                    <summary>
+                      Can you help with an existing pool?
+                      <Plus size={19} />
+                    </summary>
+                    <p>
+                      Tell us about your pool and what you want to change. We
+                      can discuss products, equipment and the scope of any work
+                      with you.
+                    </p>
+                  </details>
+                  <details>
+                    <summary>
+                      How do I find the right pool products?
+                      <Plus size={19} />
+                    </summary>
+                    <p>
+                      Save the products that interest you to your enquiry list.
+                      Include your pool dimensions and equipment details so we
+                      can help you check compatibility.
+                    </p>
+                  </details>
+                </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
 
       <footer className="footer shell">
         <div className="footer-top">
-          <a href="#" className="footer-tagline">
+          <a href="/" className="footer-tagline">
             A life by the water.
           </a>
           <nav aria-label="Footer navigation">
-            <a href="#pools">Our pools</a>
-            <a href="#approach">Our approach</a>
-            <a href="#shop">Pool shop</a>
+            <a href="/#pools">Our pools</a>
+            <a href="/#approach">Our approach</a>
+            <a href="/products/">Pool shop</a>
             <button onClick={() => openEnquiry()}>
               Start your project <ArrowUpRight size={15} />
             </button>
@@ -838,9 +882,9 @@ function App() {
         </h2>
         <nav aria-label="Mobile navigation">
           {[
-            ["Our pools", "#pools"],
-            ["Our approach", "#approach"],
-            ["Pool shop", "#shop"],
+            ["Our pools", "/#pools"],
+            ["Our approach", "/#approach"],
+            ["Pool shop", "/products/"],
           ].map(([label, href]) => (
             <a href={href} key={href} onClick={() => setMenuOpen(false)}>
               {label}
@@ -997,7 +1041,7 @@ function App() {
               Use the + on a product to save it here. Bring your favourites
               together before preparing an enquiry.
             </p>
-            <Action href="#shop" onClick={() => setBagOpen(false)}>
+            <Action href="/products/" onClick={() => setBagOpen(false)}>
               Explore the collection
             </Action>
           </div>
