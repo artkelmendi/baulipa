@@ -1,5 +1,11 @@
 # Third-party notices
 
+## Clash Display
+
+The homepage wordmark uses Clash Display by Indian Type Foundry, delivered through the official Fontshare API under the ITF Free Font License. Font files are not redistributed in this repository.
+
+Typeface and license: https://www.fontshare.com/fonts/clash-display
+
 ## Flowing Waves Shader
 
 The cosine wave displacement in `src/components/ui/water-reflections.tsx` is adapted from:

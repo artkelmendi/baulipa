@@ -1,333 +1,262 @@
-.perspective-hero {
-  height: 200svh;
-  position: relative;
-  background: var(--paper);
-  isolation: isolate;
-}
-.tunnel-stage {
-  position: sticky;
-  top: 0;
+.pool-hero {
+  --hero-water: #e3f1ef;
+  min-height: 680px;
   height: 100svh;
-  min-height: 620px;
-  width: 100%;
-  overflow: hidden;
-  perspective: 1200px;
-  background: var(--paper);
-}
-.tunnel-dots {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(var(--line) 0.65px, transparent 0.65px);
-  background-size: 27px 27px;
-  opacity: 0.55;
-  mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
-  pointer-events: none;
-}
-.tunnel-ring {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  opacity: 0.65;
-}
-.tunnel-ring-inner {
-  width: 43vmin;
-  height: 43vmin;
-}
-.tunnel-ring-outer {
-  width: 77vmin;
-  height: 77vmin;
-  border-style: dashed;
-  opacity: 0.5;
-}
-.tunnel-depth-plane {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  perspective: 1200px;
-  z-index: 2;
-  pointer-events: none;
-}
-.tunnel-card-position {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform-style: preserve-3d;
-  will-change: transform, opacity;
-  pointer-events: auto;
-}
-.tunnel-card {
-  width: 100%;
-  display: block;
-  background: var(--paper);
-  padding: 7px 7px 0;
-  border: 1px solid rgb(23 38 32/0.1);
-  border-radius: 10px;
-  box-shadow: 0 13px 35px rgb(34 64 54/0.13);
-  text-align: left;
-  overflow: hidden;
-  backface-visibility: hidden;
-  transition: box-shadow 0.25s var(--ease-out);
-}
-.tunnel-card img {
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  border-radius: 5px;
-  transition: transform 0.6s var(--ease-out);
-  user-select: none;
-}
-.tunnel-card-caption {
+  padding: clamp(104px, 14svh, 140px) max(48px, calc((100vw - 1600px) / 2)) 32px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 11px 6px 12px;
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: -0.01em;
+  flex-direction: column;
+  background: var(--hero-water);
+  overflow: clip;
 }
-.tunnel-copy-position {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
+.pool-hero-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 32px;
+}
+.pool-hero h1 {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  will-change: transform, opacity;
+  align-items: baseline;
+  font-family: "Clash Display", "Uncut Sans", sans-serif;
+  font-size: clamp(110px, 13.8vw, 224px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  margin-block: -0.1em -0.05em;
+  color: #111c1a;
 }
-.tunnel-copy {
-  position: relative;
-  text-align: center;
-  padding: 20px 25px 0;
-  max-width: 640px;
-  pointer-events: auto;
+.hero-name-part {
+  display: inline-flex;
+  overflow: hidden;
+  padding-bottom: 0.05em;
 }
-.tunnel-copy:before {
-  content: "";
-  position: absolute;
-  inset: -30px -60px;
-  z-index: -1;
-  background: radial-gradient(ellipse, var(--paper) 35%, transparent 72%);
-  pointer-events: none;
+.hero-name-part > span {
+  display: inline-block;
 }
-.tunnel-eyebrow {
-  font-size: 10px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 25px;
-}
-.tunnel-copy h1 {
-  font-size: clamp(76px, 8.5vw, 132px);
-  font-weight: 450;
-  color: #111;
-  white-space: nowrap;
-  letter-spacing: -0.075em;
-  line-height: 0.94;
-}
-.tunnel-copy h1 > span {
+.hero-name-blue {
   color: var(--blue);
-  font-weight: 650;
+  font-weight: 600;
 }
-[data-theme="dark"] .tunnel-copy h1 {
-  color: var(--ink);
+.pool-hero-copy {
+  padding-bottom: 12px;
 }
-.tunnel-description {
-  font-size: 14px;
-  color: var(--muted);
+.pool-hero-copy > p {
+  font-size: 15px;
   line-height: 1.6;
-  margin-top: 25px;
-  letter-spacing: -0.01em;
+  color: #425f5b;
 }
-.tunnel-actions {
+.pool-hero-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 27px;
-  margin-top: 27px;
+  gap: 25px;
+  margin-top: 22px;
 }
-.tunnel-project-link {
-  font-size: 12px;
+.pool-hero-actions .action {
+  white-space: nowrap;
+}
+.pool-hero-project {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding-block: 8px;
+  gap: 8px;
+  font-size: 12px;
   white-space: nowrap;
+  padding-block: 10px;
 }
-.tunnel-scroll-link {
-  position: absolute;
-  bottom: 25px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  font-size: 10px;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  color: var(--muted);
-}
-.perspective-hero.is-reduced {
-  height: 100svh;
-  min-height: 620px;
-}
-.is-reduced .tunnel-stage {
+.pool-hero-scene {
   position: relative;
+  isolation: isolate;
+  flex: 1;
+  min-height: 280px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 140px 0 140px 0;
+  background: #82bbcf;
 }
-.is-reduced .tunnel-card-position,
-.is-reduced .tunnel-copy-position {
-  will-change: auto;
+.pool-hero-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 65%;
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.pool-hero-scene::after {
+  content: "";
+  position: absolute;
+  inset: 65% 0 0;
+  background: linear-gradient(transparent, rgb(9 40 49 / 0.45));
+  pointer-events: none;
+}
+.pool-hero-scene figcaption {
+  position: absolute;
+  left: 34px;
+  bottom: 27px;
+  z-index: 1;
+  color: #fff;
+  font-size: clamp(18px, 2vw, 28px);
+  letter-spacing: -0.035em;
+}
+.pool-hero-inspirations {
+  position: absolute;
+  right: 42px;
+  bottom: 28px;
+  display: flex;
+  gap: 10px;
+  z-index: 1;
+}
+.pool-hero-inspirations button {
+  position: relative;
+  width: 90px;
+  height: 70px;
+  border: 2px solid #fff;
+  overflow: hidden;
+}
+.pool-hero-inspirations img {
+  width: 100%;
+  height: 100%;
+  transition: transform 500ms var(--ease-out);
+}
+.pool-hero-inspirations svg {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  color: #fff;
+  filter: drop-shadow(0 1px 2px #172620);
+}
+[data-theme="dark"] .pool-hero {
+  --hero-water: #1c3538;
+}
+[data-theme="dark"] .pool-hero h1 {
+  color: var(--ink);
+}
+[data-theme="dark"] .pool-hero-copy > p {
+  color: #bfd8d5;
 }
 @media (hover: hover) and (pointer: fine) {
-  .tunnel-card:hover {
-    box-shadow: 0 15px 45px rgb(34 64 54/0.22);
-  }
-  .tunnel-card:hover img {
-    transform: scale(1.04);
-  }
-  .tunnel-project-link:hover {
+  .pool-hero-project:hover {
     color: var(--blue);
   }
+  .pool-hero-inspirations button:hover img {
+    transform: scale(1.08);
+  }
 }
-@media (max-width: 1023px) {
-  .tunnel-copy h1 {
-    font-size: clamp(70px, 9.5vw, 105px);
+@media (max-width: 1200px) {
+  .pool-hero {
+    padding-inline: 36px;
   }
-  .tunnel-copy {
-    max-width: 540px;
+  .pool-hero-top {
+    gap: 25px;
   }
-  .tunnel-card-caption {
-    font-size: 9px;
-    padding: 9px 4px 10px;
+  .pool-hero-copy > p {
+    font-size: 13px;
   }
-  .tunnel-copy:before {
-    inset: -30px -35px;
+  .pool-hero-actions {
+    gap: 16px;
   }
-  .tunnel-eyebrow {
-    font-size: 9px;
+  .pool-hero-actions .action {
+    gap: 15px;
+    padding-left: 20px;
   }
-  .tunnel-actions {
-    gap: 20px;
-  }
-  .tunnel-project-link {
+  .pool-hero-project {
     font-size: 11px;
   }
 }
-@media (max-width: 767px) {
-  .perspective-hero {
-    height: 170svh;
+@media (max-width: 1023px) {
+  .pool-hero h1 {
+    font-size: 13.5vw;
   }
-  .tunnel-stage {
-    perspective: 900px;
-    min-height: 650px;
-  }
-  .tunnel-depth-plane {
-    perspective: 900px;
-  }
-  .tunnel-copy {
-    padding: 20px 15px 0;
-    max-width: 350px;
-  }
-  .tunnel-copy h1 {
-    font-size: clamp(60px, 15vw, 92px);
-    letter-spacing: -0.07em;
-  }
-  .tunnel-eyebrow {
-    font-size: 8px;
-    letter-spacing: 0.06em;
-    margin-bottom: 20px;
-  }
-  .tunnel-description {
-    font-size: 12px;
-    line-height: 1.65;
-    margin-top: 18px;
-  }
-  .tunnel-actions {
+  .pool-hero-actions {
+    align-items: start;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 21px;
-  }
-  .tunnel-actions .action {
-    font-size: 12px;
-    padding-left: 20px;
-    min-height: 46px;
-    gap: 22px;
-  }
-  .tunnel-actions .action-icon {
-    width: 33px;
-    height: 33px;
-  }
-  .tunnel-project-link {
-    font-size: 10px;
     gap: 6px;
+    margin-top: 16px;
   }
-  .tunnel-card {
-    padding: 5px 5px 0;
-    border-radius: 7px;
-  }
-  .tunnel-card img {
-    border-radius: 3px;
-    aspect-ratio: 4/3;
-  }
-  .tunnel-card-caption {
-    font-size: 8px;
-    padding: 8px 3px 9px;
-  }
-  .tunnel-card-caption svg {
-    width: 11px;
-  }
-  .tunnel-ring-inner {
-    width: 66vmin;
-    height: 66vmin;
-  }
-  .tunnel-ring-outer {
-    width: 125vmin;
-    height: 125vmin;
-  }
-  .tunnel-copy:before {
-    inset: -20px -18px;
-    background: radial-gradient(ellipse, var(--paper) 42%, transparent 73%);
-  }
-  .tunnel-scroll-link {
-    font-size: 9px;
-    bottom: 19px;
-  }
-  .perspective-hero.is-reduced {
-    height: 100svh;
-    min-height: 650px;
+  .pool-hero-scene {
+    border-radius: 100px 0 100px 0;
   }
 }
-@media (max-height: 650px) and (min-width: 768px) {
-  .tunnel-stage {
-    min-height: 560px;
+@media (max-width: 767px) {
+  .pool-hero {
+    height: 100svh;
+    min-height: 650px;
+    padding: 100px 20px 25px;
   }
-  .tunnel-copy h1 {
-    font-size: 80px;
+  .pool-hero-top {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
   }
-  .tunnel-eyebrow {
-    margin-bottom: 15px;
+  .pool-hero h1 {
+    font-size: clamp(84px, 24vw, 158px);
   }
-  .tunnel-description {
-    margin-top: 17px;
+  .pool-hero-copy {
+    padding-bottom: 0;
   }
-  .tunnel-actions {
-    margin-top: 20px;
+  .pool-hero-copy > p {
+    font-size: 13px;
+  }
+  .pool-hero-actions {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .pool-hero-actions .action {
+    font-size: 12px;
+    min-height: 44px;
+    gap: 15px;
+  }
+  .pool-hero-actions .action-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .pool-hero-project {
+    font-size: 11px;
+  }
+  .pool-hero-scene {
+    flex: 1;
+    min-height: 240px;
+    border-radius: 75px 0 75px 0;
+  }
+  .pool-hero-photo {
+    object-position: 53% 65%;
+  }
+  .pool-hero-scene figcaption {
+    font-size: 19px;
+    left: 22px;
+    bottom: 24px;
+  }
+  .pool-hero-inspirations {
+    right: 22px;
+    bottom: 22px;
+    gap: 6px;
+  }
+  .pool-hero-inspirations button {
+    width: 45px;
+    height: 41px;
+  }
+}
+@media (max-height: 700px) and (min-width: 768px) {
+  .pool-hero {
+    min-height: 620px;
+    padding-top: 100px;
+    padding-bottom: 24px;
+  }
+  .pool-hero h1 {
+    font-size: clamp(100px, 12vw, 175px);
+  }
+  .pool-hero-top {
+    margin-bottom: 22px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .perspective-hero {
-    height: 100svh;
+  .pool-hero-photo {
+    will-change: auto;
   }
-  .tunnel-stage {
-    position: relative;
-  }
-  .tunnel-card img {
+  .pool-hero-inspirations img {
     transition: none;
   }
 }

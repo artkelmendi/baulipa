@@ -4,8 +4,7 @@ import { products, featuredProductId, showcaseHotels } from "../data";
 import { sitePath } from "../paths";
 import "./collection-highlights.css";
 
-const ribbonPath =
-  "M0 130 C400 60 650 60 1000 125 S1700 185 2000 115 S2300 70 2400 105";
+const ribbonPath = "M0 120 H2400";
 
 function HotelWordmark({ hotel }) {
   if (hotel.logo)

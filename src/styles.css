@@ -2371,13 +2371,13 @@ h2 {
   }
 }
 
-/* The tunnel fills the first viewport; navigation floats above its light canvas. */
+/* Navigation shares the initial page canvas. */
 .header {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  background: var(--paper);
+  background: transparent;
 }
 
 /* Restore native dialog centering after the CSS reset. */
