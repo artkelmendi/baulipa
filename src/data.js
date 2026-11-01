@@ -1,4 +1,16 @@
 import { sitePath } from "./paths.js";
+// Change this ID to choose the single product shown in the homepage spotlight.
+export const featuredProductId = "cleaner";
+
+// Layout placeholders only. These hotels are not asserted to be BAULIPA clients.
+// Five-star references: swissdiamondgroup.com/en/prishtina/index,
+// emeraldhotel.info/en, venushotel-ks.com/about-us/.
+export const showcaseHotels = [
+  { id: "swiss", name: "Swiss Diamond", descriptor: "Hotel Prishtina" },
+  { id: "emerald", name: "Emerald", descriptor: "Hotel & Resort · Prishtina" },
+  { id: "venus", name: "Venus", descriptor: "Hotel · Kosovo" },
+];
+
 // Illustrative product selection. Replace with BAULIPA's confirmed catalog before commercial launch.
 export const products = [
   {

@@ -24,6 +24,10 @@ import { products, pools, processSteps } from "./data";
 import PerspectiveTunnelHero from "@/components/ui/perspective-tunnel-hero";
 import WaterReflections from "@/components/ui/water-reflections";
 import ProductPage from "./components/ProductPage";
+import {
+  ClientShowcase,
+  FeaturedCollection,
+} from "./components/CollectionHighlights";
 import { sitePath, routePath } from "./paths";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -151,8 +155,8 @@ function useChoreography(root, galleryTween) {
             );
           });
         const planning = gsap.timeline({
+          paused: true,
           defaults: { ease: "power3.out" },
-          scrollTrigger: { trigger: ".process", start: "top 78%", once: true },
         });
         planning
           .from(".process-title .plan-line > span", {
@@ -170,6 +174,12 @@ function useChoreography(root, galleryTween) {
             },
             0.15,
           );
+        ScrollTrigger.create({
+          trigger: ".process",
+          start: "top 78%",
+          once: true,
+          onEnter: () => planning.play(),
+        });
         gsap.utils.toArray(".process-step, .process-end").forEach((el) => {
           gsap.from(el, {
             opacity: 0,
@@ -187,6 +197,47 @@ function useChoreography(root, galleryTween) {
             ease: "power3.out",
             scrollTrigger: { trigger: el, start: "top 90%", once: true },
           }),
+        );
+        const spotlight = gsap
+          .timeline({
+            paused: true,
+            defaults: { ease: "power3.out" },
+          })
+          .from(".featured-statement", {
+            clipPath: "inset(0 100% 0 0)",
+            x: -20,
+            duration: 0.9,
+          })
+          .from(
+            ".featured-photo",
+            { opacity: 0, scale: 0.92, rotation: -5, y: 35, duration: 1.2 },
+            0.08,
+          )
+          .from(
+            ".featured-orbit",
+            { opacity: 0, scale: 0.9, duration: 1.2 },
+            0.1,
+          )
+          .from(".featured-bottom", { opacity: 0, y: 24, duration: 0.7 }, 0.4);
+        ScrollTrigger.create({
+          trigger: ".featured-stage",
+          start: "top 82%",
+          once: true,
+          onEnter: () => spotlight.play(),
+        });
+        gsap.fromTo(
+          ".featured-photo img",
+          { yPercent: -3 },
+          {
+            yPercent: 3,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".featured-stage",
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
         );
         // Header entrance is independent of the supplied Motion-driven tunnel hero.
         gsap.from(".header-brand, .desktop-nav, .header-actions", {
@@ -536,6 +587,8 @@ function App() {
               onSelectPool={setSelectedPool}
             />
 
+            <ClientShowcase />
+
             <section
               className="intro shell"
               id="studio"
@@ -761,6 +814,8 @@ function App() {
                 </div>
               </div>
             </section>
+
+            <FeaturedCollection savedIds={savedIds} onAdd={addProduct} />
 
             <section className="shop" id="shop" aria-labelledby="shop-title">
               <div className="shop-header shell">

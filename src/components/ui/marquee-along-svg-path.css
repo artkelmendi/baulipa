@@ -1,0 +1,40 @@
+.path-marquee {
+  position: relative;
+  height: 240px;
+  overflow: clip;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 7%,
+    #000 93%,
+    transparent
+  );
+}
+.path-marquee-measure {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.path-marquee-item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 230px;
+  will-change: transform;
+}
+.path-marquee-static {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 35px;
+  padding: 45px 20px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .path-marquee {
+    height: auto;
+    min-height: 180px;
+    mask-image: none;
+  }
+}
