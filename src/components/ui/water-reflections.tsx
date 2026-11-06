@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./water-reflections.css";
 
@@ -49,6 +49,35 @@ const FRAGMENT = `
   }
 `;
 
+const REFRACTION = `
+  precision mediump float;
+  uniform vec2 u_resolution;
+  uniform float u_time;
+  uniform float u_image_aspect;
+  uniform sampler2D u_image;
+  varying vec2 v_uv;
+
+  void main() {
+    float aspect = u_resolution.x / u_resolution.y;
+    vec2 cover = min(vec2(1.0), vec2(aspect / u_image_aspect, u_image_aspect / aspect));
+    vec2 p = (v_uv - 0.5) * u_resolution / min(u_resolution.x, u_resolution.y);
+    float time = u_time * 0.85;
+
+    // Crossing wave fronts bend the sunlight patterns in different directions.
+    float a = sin(dot(p, vec2(10.0, 13.0)) - time * 1.6);
+    float b = sin(dot(p, vec2(-15.0, 7.0)) + time * 1.25 + 0.7 * a);
+    float c = sin(dot(p, vec2(6.0, -21.0)) - time * 1.9);
+    vec2 bend = vec2(a + 0.55 * b, b + 0.5 * c) * 0.017;
+    bend *= min(u_resolution.x, u_resolution.y) / u_resolution;
+
+    vec2 sampleUv = 0.5 + (v_uv - 0.5 + bend) * cover * 0.95;
+    vec3 color = texture2D(u_image, sampleUv).rgb;
+    float shimmer = smoothstep(0.48, 0.96, max(color.g, color.b));
+    color *= 1.0 + shimmer * (0.08 * a + 0.05 * c);
+    gl_FragColor = vec4(color, 1.0);
+  }
+`;
+
 function parseHex(color: string): [number, number, number] {
   const value = color.trim().replace("#", "");
   return [0, 2, 4].map(
@@ -56,16 +85,22 @@ function parseHex(color: string): [number, number, number] {
   ) as [number, number, number];
 }
 
-export default function WaterReflections() {
+export default function WaterReflections({
+  imageRef,
+}: {
+  imageRef?: RefObject<HTMLImageElement | null>;
+} = {}) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
+    const image = imageRef?.current;
 
     const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
     let cleanupRenderer: (() => void) | undefined;
     let updatePlayback = () => {};
+    let updateScroll = (_progress: number) => {};
     let isNearViewport = false;
 
     function initialize() {
@@ -95,7 +130,7 @@ export default function WaterReflections() {
           : null;
       }
       const vertex = compile(gl.VERTEX_SHADER, VERTEX);
-      const fragment = compile(gl.FRAGMENT_SHADER, FRAGMENT);
+      const fragment = compile(gl.FRAGMENT_SHADER, image ? REFRACTION : FRAGMENT);
       const program = gl.createProgram();
       if (!vertex || !fragment || !program) {
         shaders.forEach((shader) => gl.deleteShader(shader));
@@ -114,6 +149,19 @@ export default function WaterReflections() {
       }
 
       const buffer = gl.createBuffer();
+      const texture = image ? gl.createTexture() : null;
+      function releaseResources() {
+        if (buffer) gl!.deleteBuffer(buffer);
+        if (texture) gl!.deleteTexture(texture);
+        gl!.deleteProgram(program);
+        shaders.forEach((shader) => gl!.deleteShader(shader));
+      }
+      if (!buffer || (image && !texture)) {
+        releaseResources();
+        host.dataset.state = "fallback";
+        return;
+      }
+
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(
         gl.ARRAY_BUFFER,
@@ -129,18 +177,38 @@ export default function WaterReflections() {
       const paper = gl.getUniformLocation(program, "u_paper");
       const water = gl.getUniformLocation(program, "u_water");
       const light = gl.getUniformLocation(program, "u_light");
+      if (image) {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        if (gl.getError() !== gl.NO_ERROR) {
+          releaseResources();
+          host.dataset.state = "fallback";
+          return;
+        }
+        gl.uniform1f(
+          gl.getUniformLocation(program, "u_image_aspect"),
+          image.naturalWidth / image.naturalHeight,
+        );
+      }
       let frame = 0;
-      let elapsed = 4.2;
+      let elapsed = image ? 0 : 4.2;
+      let passStart = elapsed;
+      let scrollOffset = 0;
       let previousTime = 0;
       let lastPaint = 0;
       let contextLost = false;
 
       function paint() {
         if (contextLost) return;
-        gl!.uniform1f(time, elapsed);
+        gl!.uniform1f(time, elapsed + scrollOffset);
         gl!.drawArrays(gl!.TRIANGLES, 0, 6);
       }
       function updatePalette() {
+        if (image) return;
         const tokens = getComputedStyle(document.documentElement);
         const base = parseHex(tokens.getPropertyValue("--paper") || "#f8f9f7");
         const dark = base[0] < 0.5;
@@ -170,9 +238,15 @@ export default function WaterReflections() {
         elapsed += Math.min((timestamp - previousTime) / 1000, 0.1);
         previousTime = timestamp;
         // This slow ambient effect needs only 30 paints per second.
-        if (timestamp - lastPaint >= 1000 / 30) {
+        if (timestamp - lastPaint >= 30) {
           paint();
           lastPaint = timestamp;
+        }
+        // The photographed water gets one short shimmer as it comes into view.
+        if (image && elapsed - passStart >= 4.8) {
+          host!.dataset.state = "still";
+          frame = 0;
+          return;
         }
         frame = requestAnimationFrame(tick);
       }
@@ -182,6 +256,7 @@ export default function WaterReflections() {
         previousTime = 0;
         if (contextLost) return;
         if (isNearViewport && !document.hidden && !motionQuery.matches) {
+          passStart = elapsed;
           host!.dataset.state = "running";
           frame = requestAnimationFrame(tick);
         } else {
@@ -189,6 +264,13 @@ export default function WaterReflections() {
           paint();
         }
       };
+      if (image) {
+        updateScroll = (progress) => {
+          if (!isNearViewport || document.hidden || motionQuery.matches) return;
+          scrollOffset = progress * 4;
+          if (!frame) paint();
+        };
+      }
       function onContextLost(event: Event) {
         event.preventDefault();
         contextLost = true;
@@ -209,7 +291,6 @@ export default function WaterReflections() {
         attributeFilter: ["data-theme"],
       });
       canvas.addEventListener("webglcontextlost", onContextLost);
-      updatePlayback();
 
       cleanupRenderer = () => {
         cancelAnimationFrame(frame);
@@ -217,38 +298,48 @@ export default function WaterReflections() {
         resizeObserver.disconnect();
         themeObserver.disconnect();
         canvas.removeEventListener("webglcontextlost", onContextLost);
-        gl!.deleteBuffer(buffer);
-        gl!.deleteProgram(program);
-        shaders.forEach((shader) => gl!.deleteShader(shader));
+        releaseResources();
         canvas.remove();
       };
     }
 
     function syncVisibility(active: boolean) {
       isNearViewport = active;
-      if (active && !cleanupRenderer && host!.dataset.state !== "fallback")
+      if (
+        active &&
+        !cleanupRenderer &&
+        host!.dataset.state !== "fallback" &&
+        (!image ||
+          (image.complete &&
+            image.naturalWidth > 0 &&
+            !motionQuery.matches &&
+            !document.hidden))
+      )
         initialize();
       updatePlayback();
     }
     // Use the page's existing scroll engine so this respects its pinned gallery and deep links.
     const trigger = ScrollTrigger.create({
       trigger: host.parentElement ?? host,
-      start: "top bottom+=120",
-      end: "bottom top-=120",
+      start: image ? "top 92%" : "top bottom+=120",
+      end: image ? "bottom 8%" : "bottom top-=120",
       onToggle: (self) => syncVisibility(self.isActive),
       onRefresh: (self) => syncVisibility(self.isActive),
+      onUpdate: image ? (self) => updateScroll(self.progress) : undefined,
     });
-    const onPlaybackChange = () => updatePlayback();
+    const onPlaybackChange = () => syncVisibility(isNearViewport);
+    image?.addEventListener("load", onPlaybackChange);
     document.addEventListener("visibilitychange", onPlaybackChange);
     motionQuery.addEventListener("change", onPlaybackChange);
 
     return () => {
       trigger.kill();
+      image?.removeEventListener("load", onPlaybackChange);
       document.removeEventListener("visibilitychange", onPlaybackChange);
       motionQuery.removeEventListener("change", onPlaybackChange);
       cleanupRenderer?.();
     };
-  }, []);
+  }, [imageRef]);
 
   return (
     <div

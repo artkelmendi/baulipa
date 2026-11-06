@@ -2,7 +2,8 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
-  height: clamp(350px, 68svh, 690px);
+  height: clamp(290px, 55svh, 570px);
+  scroll-margin-top: clamp(64px, 17svh, 150px);
   background: var(--paper);
 }
 
@@ -12,13 +13,6 @@
   background: #087586;
 }
 
-.waterline-surface::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background: linear-gradient(180deg, var(--surface), transparent 19% 75%, var(--paper));
-}
-
 .waterline-photo {
   display: block;
   width: 100%;
@@ -26,82 +20,43 @@
   object-fit: cover;
 }
 
-.waterline-ripple {
-  position: absolute;
-  top: 50%;
-  left: 55%;
-  width: clamp(290px, 37vw, 620px);
-  overflow: visible;
-  transform: translate(-50%, -50%);
-  stroke: rgb(242 255 255 / 0.85);
-  stroke-width: 1.1;
-}
-
-.waterline-ripple circle {
+.waterline .water-reflections {
+  inset: 0;
+  z-index: auto;
   opacity: 0;
-  transform-box: fill-box;
+  background: none;
+  mask-image: none;
+  transition: opacity 250ms var(--ease-out);
 }
 
-.waterline-caption {
+.waterline .water-reflections:is([data-state="running"], [data-state="still"], [data-state="paused"]) {
+  opacity: 1;
+}
+
+.waterline::after {
   position: absolute;
-  z-index: 1;
-  inset: 68% 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #f4fffe;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-  text-shadow: 0 1px 8px #004652;
+  inset: 0 0 auto;
+  height: 20%;
+  content: "";
+  background: linear-gradient(var(--surface), transparent);
+  pointer-events: none;
 }
 
-.waterline-caption > span {
-  width: 20px;
-  height: 1px;
-  background: currentColor;
-}
-
-.waterline-plan {
+.waterline-wash {
   position: absolute;
-  inset: 13% 0 0;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  opacity: 0;
-  color: var(--blue);
-}
-
-.waterline-plan svg {
-  width: min(76vw, 650px);
-  stroke: currentColor;
-  stroke-width: 1.1;
-}
-
-.waterline-plan-outline {
-  stroke-width: 1.7;
-  stroke-dasharray: 1;
-}
-
-.waterline-plan-guides {
-  opacity: 0.55;
-  stroke-dasharray: 4 3;
-}
-
-.waterline-plan > span {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  inset: -14% -10% -34%;
+  background:
+    radial-gradient(ellipse 92% 66% at 65% 123%, var(--paper) 75%, transparent),
+    linear-gradient(180deg, transparent 57%, var(--paper) 76.5%);
+  pointer-events: none;
 }
 
 .waterline + .process {
-  padding-top: clamp(40px, 6vw, 100px);
+  padding-top: clamp(24px, 4vw, 72px);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .waterline {
-    height: clamp(230px, 36svh, 430px);
+    height: clamp(220px, 36svh, 400px);
   }
 }

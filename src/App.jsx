@@ -167,6 +167,8 @@ function useChoreography(root, galleryTween) {
     let active = true;
     const ctx = gsap.context(() => {
       media.add("(prefers-reduced-motion: no-preference)", () => {
+        // Play reveals forward once and keep their triggers until teardown.
+        // A once-trigger can remove itself during a refresh at a restored scroll position.
         gsap.from(".gallery-heading h2", {
           clipPath: "inset(0 0 100% 0)",
           y: 35,
@@ -175,14 +177,13 @@ function useChoreography(root, galleryTween) {
           scrollTrigger: {
             trigger: ".pool-gallery",
             start: "top 85%",
-            once: true,
           },
         });
         gsap.utils
           .toArray(".pool-card-image, .shop .product-image")
           .forEach((el, i) => {
             const tl = gsap.timeline({
-              scrollTrigger: { trigger: el, start: "top 92%", once: true },
+              scrollTrigger: { trigger: el, start: "top 92%" },
             });
             tl.from(el, {
               clipPath: "inset(100% 0 0 0)",
@@ -218,7 +219,6 @@ function useChoreography(root, galleryTween) {
         ScrollTrigger.create({
           trigger: ".process",
           start: "top 78%",
-          once: true,
           onEnter: () => planning.play(),
         });
         gsap.utils.toArray(".process-step, .process-end").forEach((el) => {
@@ -227,7 +227,7 @@ function useChoreography(root, galleryTween) {
             y: 24,
             duration: 0.7,
             ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 90%", once: true },
+            scrollTrigger: { trigger: el, start: "top 90%" },
           });
         });
         gsap.utils.toArray(".shop-header h2, .contact h2").forEach((el) =>
@@ -236,7 +236,7 @@ function useChoreography(root, galleryTween) {
             y: 30,
             duration: 1,
             ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 90%", once: true },
+            scrollTrigger: { trigger: el, start: "top 90%" },
           }),
         );
         const spotlight = gsap
@@ -263,7 +263,6 @@ function useChoreography(root, galleryTween) {
         ScrollTrigger.create({
           trigger: ".featured-stage",
           start: "top 82%",
-          once: true,
           onEnter: () => spotlight.play(),
         });
         gsap.fromTo(
@@ -312,7 +311,7 @@ function useChoreography(root, galleryTween) {
             opacity: 0,
             duration: 0.85,
             ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 92%", once: true },
+            scrollTrigger: { trigger: el, start: "top 92%" },
           });
         });
         gsap.fromTo(
@@ -337,7 +336,6 @@ function useChoreography(root, galleryTween) {
           scrollTrigger: {
             trigger: ".footer-brand",
             start: "top 95%",
-            once: true,
           },
         });
       });
