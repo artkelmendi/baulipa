@@ -37,6 +37,7 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   scroll-behavior: smooth;
   scroll-padding-top: 24px;
+  scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -1057,25 +1058,53 @@ h2 {
 .product-dialog {
   padding: 0;
 }
+.product-dialog::backdrop {
+  background: rgb(17 31 26 / 0.7);
+  backdrop-filter: none;
+}
+.dialog.product-photo-dialog {
+  max-width: min(840px, calc(100vw - 24px), calc(100dvh - 36px));
+}
 .product-detail {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
 }
-.product-detail > img {
+.product-preview-photo {
+  overflow: hidden;
+  background: var(--product-bg);
+}
+.product-preview-photo img {
   width: 100%;
   height: 100%;
   max-height: 640px;
   object-fit: contain;
-  background: var(--product-bg);
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 240ms var(--ease-out),
+    transform 280ms var(--ease-out);
 }
-.product-detail > div {
+.product-photo-only img {
+  max-height: none;
+}
+.product-dialog[open] .product-preview-photo img {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  .product-dialog[open] .product-preview-photo img {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+.product-detail-copy {
   padding: 55px 38px;
 }
 .product-detail h2 {
   font-size: 42px;
 }
-.product-detail > div > p {
+.product-detail-copy > p {
   font-size: 14px;
   color: var(--muted);
   margin-top: 22px;
@@ -1112,8 +1141,10 @@ h2 {
   color: var(--muted);
   margin-bottom: 25px;
 }
-.detail-list-link {
+.product-detail-links {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
   margin-top: 22px;
   font-size: 12px;
 }
@@ -2125,17 +2156,17 @@ h2 {
   .product-detail {
     grid-template-columns: 1fr;
   }
-  .product-detail > img {
+  .product-detail .product-preview-photo img {
     height: 260px;
     object-fit: contain;
   }
-  .product-detail > div {
+  .product-detail-copy {
     padding: 25px;
   }
   .product-detail h2 {
     font-size: 35px;
   }
-  .product-detail > div > p {
+  .product-detail-copy > p {
     font-size: 13px;
     margin-top: 17px;
   }
@@ -2328,7 +2359,8 @@ h2 {
     will-change: auto;
   }
   .dialog,
-  .dialog[open] {
+  .dialog[open],
+  .product-dialog .product-preview-photo img {
     transform: none;
   }
   .notice {

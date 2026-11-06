@@ -7,17 +7,19 @@ import {
   Plus,
   Check,
   MagnifyingGlass,
+  MagnifyingGlassPlus,
 } from "@phosphor-icons/react";
 import { products } from "../data";
 import WaterReflections from "./ui/water-reflections";
 import "./product-page.css";
 
-export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
+export default function ProductPage({ savedIds, onAdd, onEnquiry, onPreview }) {
   const pageRef = useRef(null);
   const [category, setCategory] = useState("All essentials");
   const [search, setSearch] = useState("");
   const id = routePath().split("/").filter(Boolean)[1];
   const product = products.find((item) => item.id === id);
+  const FeatureImage = product ? "button" : "div";
   useLayoutEffect(() => {
     if (!pageRef.current) return;
     const media = gsap.matchMedia();
@@ -177,7 +179,12 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
             </a>
           )}
         </div>
-        <div className="products-feature-image">
+        <FeatureImage
+          className="products-feature-image"
+          onClick={product ? () => onPreview(product, true) : undefined}
+          aria-label={product ? `Enlarge photo of ${product.name}` : undefined}
+          aria-haspopup={product ? "dialog" : undefined}
+        >
           <img
             src={product?.image || sitePath("/images/product-cleaner.webp")}
             alt={
@@ -188,7 +195,12 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
             height="850"
             fetchPriority="high"
           />
-        </div>
+          {product && (
+            <span className="product-photo-zoom" aria-hidden="true">
+              <MagnifyingGlassPlus size={21} />
+            </span>
+          )}
+        </FeatureImage>
       </section>
       {product ? (
         <section className="product-information shell">
@@ -283,9 +295,11 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
             {visible.map((item) => (
               <article className="product-card" key={item.id}>
                 <div className="product-image">
-                  <a
+                  <button
                     className="product-image-link"
-                    href={sitePath(`/products/${item.id}/`)}
+                    onClick={() => onPreview(item)}
+                    aria-label={`Preview ${item.name}`}
+                    aria-haspopup="dialog"
                   >
                     <img
                       src={item.image}
@@ -294,7 +308,7 @@ export default function ProductPage({ savedIds, onAdd, onEnquiry }) {
                       height="850"
                       loading="lazy"
                     />
-                  </a>
+                  </button>
                   <button
                     className={`add-product ${savedIds.includes(item.id) ? "is-saved" : ""}`}
                     aria-label={`Save ${item.name} to enquiry`}

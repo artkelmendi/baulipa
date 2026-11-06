@@ -38,6 +38,7 @@
   margin: 25px 0;
 }
 .products-feature-image {
+  position: relative;
   background: var(--product-bg);
   aspect-ratio: 1.15;
   overflow: hidden;
@@ -47,6 +48,22 @@
   height: 100%;
   object-fit: contain;
   mix-blend-mode: multiply;
+}
+.product-photo-zoom {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: var(--paper);
+}
+.products-feature-image:focus-visible .product-photo-zoom {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
 }
 .products-catalog {
   padding-block: 90px;

@@ -20,10 +20,13 @@ import {
 } from "@phosphor-icons/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 import { products, pools, processSteps } from "./data";
 import PerspectiveTunnelHero from "@/components/ui/perspective-tunnel-hero";
 import WaterReflections from "@/components/ui/water-reflections";
 import ProductPage from "./components/ProductPage";
+import Waterline from "./components/Waterline";
 import {
   ClientShowcase,
   FeaturedCollection,
@@ -72,7 +75,7 @@ function Action({
 
 function Dialog({ open, onClose, titleId, className = "", children }) {
   const ref = useRef(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const dialog = ref.current;
     if (!open) {
       if (dialog.open) dialog.close();
@@ -91,6 +94,7 @@ function Dialog({ open, onClose, titleId, className = "", children }) {
       ref={ref}
       className={`dialog ${className}`}
       aria-labelledby={titleId}
+      data-lenis-prevent
       onCancel={(e) => {
         e.preventDefault();
         onClose();
@@ -117,6 +121,43 @@ function Dialog({ open, onClose, titleId, className = "", children }) {
       {children}
     </dialog>
   );
+}
+
+function useSmoothScroll() {
+  const engine = useRef(null);
+  useEffect(() => {
+    const media = gsap.matchMedia();
+    media.add(
+      "(any-pointer: fine) and (prefers-reduced-motion: no-preference)",
+      () => {
+        const lenis = new Lenis({
+          lerp: 0.15,
+          virtualScroll: ({ deltaX, deltaY, event }) =>
+            !event.shiftKey && Math.abs(deltaY) >= Math.abs(deltaX),
+        });
+        engine.current = lenis;
+        const tick = (seconds) => lenis.raf(seconds * 1000);
+        const settleScroll = () => {
+          if (lenis.isScrolling === "smooth") {
+            lenis.scrollTo(window.scrollY, { immediate: true });
+          }
+        };
+        lenis.on("scroll", ScrollTrigger.update);
+        gsap.ticker.add(tick);
+        window.addEventListener("pointerdown", settleScroll);
+        window.addEventListener("keydown", settleScroll);
+        return () => {
+          window.removeEventListener("pointerdown", settleScroll);
+          window.removeEventListener("keydown", settleScroll);
+          gsap.ticker.remove(tick);
+          lenis.destroy();
+          engine.current = null;
+        };
+      },
+    );
+    return () => media.revert();
+  }, []);
+  return engine;
 }
 
 function useChoreography(root, galleryTween) {
@@ -379,7 +420,7 @@ function App() {
     readSaved("baulipa-theme-v2", "light"),
   );
   const [filter, setFilter] = useState("All essentials");
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productPreview, setProductPreview] = useState(null);
   const [selectedPool, setSelectedPool] = useState(null);
   const [bagOpen, setBagOpen] = useState(false);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
@@ -392,6 +433,7 @@ function App() {
       : [];
   });
   const [notice, setNotice] = useState("");
+  const scrollEngine = useSmoothScroll();
   useChoreography(root, galleryTween);
 
   useEffect(() => {
@@ -479,10 +521,18 @@ function App() {
   function openEnquiry(value = "A new swimming pool") {
     setInterest(value);
     setSelectedPool(null);
-    setSelectedProduct(null);
+    closeProduct();
     setBagOpen(false);
     setMenuOpen(false);
     setEnquiryOpen(true);
+  }
+  function openProduct(product, imageOnly = false) {
+    setProductPreview({ product, imageOnly, open: true });
+  }
+  function closeProduct() {
+    setProductPreview((preview) =>
+      preview?.open ? { ...preview, open: false } : preview,
+    );
   }
   function addProduct(id) {
     setSavedIds((current) =>
@@ -504,10 +554,9 @@ function App() {
             (pools.length - 1),
         ),
       );
-      window.scrollTo({
-        top: trigger.start + (trigger.end - trigger.start) * next,
-        behavior: "smooth",
-      });
+      const top = trigger.start + (trigger.end - trigger.start) * next;
+      if (scrollEngine.current) scrollEngine.current.scrollTo(top);
+      else window.scrollTo({ top, behavior: "smooth" });
     } else {
       galleryViewport.current.scrollBy({
         left: direction * galleryViewport.current.clientWidth * 0.86,
@@ -517,6 +566,8 @@ function App() {
       });
     }
   }
+  const selectedProduct = productPreview?.product;
+  const productPhotoOnly = productPreview?.imageOnly;
   const savedProducts = products.filter((p) => savedIds.includes(p.id));
   const visibleProducts = products.filter(
     (p) => filter === "All essentials" || p.category === filter,
@@ -578,6 +629,7 @@ function App() {
             savedIds={savedIds}
             onAdd={addProduct}
             onEnquiry={openEnquiry}
+            onPreview={openProduct}
           />
         ) : (
           <>
@@ -681,6 +733,7 @@ function App() {
                   className="pool-viewport"
                   ref={galleryViewport}
                   tabIndex="0"
+                  data-lenis-prevent-horizontal
                   aria-label="Pool styles gallery. Use the arrow buttons to explore."
                   onKeyDown={(event) => {
                     if (
@@ -725,6 +778,8 @@ function App() {
                 </p>
               </div>
             </section>
+
+            <Waterline />
 
             <section
               className="process shell"
@@ -867,8 +922,9 @@ function App() {
                       <div className="product-image">
                         <button
                           className="product-image-link"
-                          onClick={() => setSelectedProduct(product)}
+                          onClick={() => openProduct(product)}
                           aria-label={`View ${product.name}`}
+                          aria-haspopup="dialog"
                         >
                           <img
                             src={product.image}
@@ -898,7 +954,7 @@ function App() {
                         {product.category}
                       </span>
                       <h3>
-                        <button onClick={() => setSelectedProduct(product)}>
+                        <button onClick={() => openProduct(product)}>
                           {product.name}
                           <ArrowUpRight size={19} />
                         </button>
@@ -1063,50 +1119,68 @@ function App() {
       </Dialog>
 
       <Dialog
-        open={!!selectedProduct}
-        onClose={() => setSelectedProduct(null)}
+        open={!!productPreview?.open}
+        onClose={closeProduct}
         titleId="product-title"
-        className="product-dialog"
+        className={`product-dialog${productPhotoOnly ? " product-photo-dialog" : ""}`}
       >
         {selectedProduct && (
-          <div className="product-detail">
-            <img
-              src={selectedProduct.image}
-              alt={selectedProduct.name}
-              width="850"
-              height="850"
-            />
-            <div>
-              <span className="eyebrow">{selectedProduct.category}</span>
-              <h2 id="product-title">{selectedProduct.name}</h2>
-              <p>{selectedProduct.description}</p>
-              <ul>
-                {selectedProduct.details.map((d) => (
-                  <li key={d}>
-                    <Check size={17} />
-                    {d}
-                  </li>
-                ))}
-              </ul>
-              <p className="detail-note">{selectedProduct.note}</p>
-              <p className="detail-availability">
-                Collection preview. Models and pricing on request.
-              </p>
-              <Action onClick={() => addProduct(selectedProduct.id)}>
-                {savedIds.includes(selectedProduct.id)
-                  ? "Added to your list"
-                  : "Add to enquiry"}
-              </Action>
-              <button
-                className="text-link detail-list-link"
-                onClick={() => {
-                  setSelectedProduct(null);
-                  setBagOpen(true);
-                }}
-              >
-                View enquiry list <ArrowRight size={18} />
-              </button>
+          <div
+            className={productPhotoOnly ? "product-photo-only" : "product-detail"}
+          >
+            <div className="product-preview-photo">
+              <img
+                src={selectedProduct.image}
+                alt={selectedProduct.name}
+                width="850"
+                height="850"
+              />
             </div>
+            {productPhotoOnly ? (
+              <h2 id="product-title" className="sr-only">
+                {selectedProduct.name}
+              </h2>
+            ) : (
+              <div className="product-detail-copy">
+                <span className="eyebrow">{selectedProduct.category}</span>
+                <h2 id="product-title">{selectedProduct.name}</h2>
+                <p>{selectedProduct.description}</p>
+                <ul>
+                  {selectedProduct.details.map((d) => (
+                    <li key={d}>
+                      <Check size={17} />
+                      {d}
+                    </li>
+                  ))}
+                </ul>
+                <p className="detail-note">{selectedProduct.note}</p>
+                <p className="detail-availability">
+                  Collection preview. Models and pricing on request.
+                </p>
+                <Action onClick={() => addProduct(selectedProduct.id)}>
+                  {savedIds.includes(selectedProduct.id)
+                    ? "Added to your list"
+                    : "Add to enquiry"}
+                </Action>
+                <div className="product-detail-links">
+                  <a
+                    className="text-link"
+                    href={sitePath(`/products/${selectedProduct.id}/`)}
+                  >
+                    Full product details <ArrowUpRight size={18} />
+                  </a>
+                  <button
+                    className="text-link"
+                    onClick={() => {
+                      closeProduct();
+                      setBagOpen(true);
+                    }}
+                  >
+                    View enquiry list <ArrowRight size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Dialog>

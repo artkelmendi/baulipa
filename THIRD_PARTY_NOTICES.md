@@ -6,6 +6,10 @@ The homepage wordmark uses Clash Display by Indian Type Foundry, delivered throu
 
 Typeface and license: https://www.fontshare.com/fonts/clash-display
 
+## Lenis
+
+Mouse-wheel easing uses [Lenis](https://github.com/darkroomengineering/lenis) by darkroom.engineering. The MIT license is included in the distribution at `/licenses/lenis.txt`.
+
 ## Flowing Waves Shader
 
 The cosine wave displacement in `src/components/ui/water-reflections.tsx` is adapted from:

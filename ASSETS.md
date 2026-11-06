@@ -29,3 +29,9 @@ Use case: product-mockup. Asset type: square ecommerce catalog photograph. A sin
 ## public/images/product-tools.webp
 
 Use case: product-mockup. Asset type: square ecommerce catalog photograph. A premium unbranded pool cleaning skimmer net with navy blue rim and fine white mesh paired with a navy and white pool brush. Arrange the two tools diagonally in an elegant studio flat lay, short white handles, clearly functional pool maintenance tools. Very pale cool grey seamless background, realistic soft contact shadows, minimal high end catalog photography, objects centered with large breathing room around. No text, logos, lettering, watermarks, pool water or other props.
+
+## public/images/pool-waterline.webp
+
+Generated with the built-in image tool for the scroll transition.
+
+Use case: photorealistic-natural. Wide landscape website texture. Directly overhead photograph of clear turquoise swimming-pool water, filling the entire frame. Sunlight traces fine irregular caustics on a smooth pale blue plaster floor, with deeper petrol blue toward the left and brighter cyan toward the right. Broad gentle variations and clear surface ripples. Natural architectural photography, crisp without oversaturation. No pool edges, tiles, objects, text, or logos.
