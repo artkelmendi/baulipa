@@ -123,6 +123,40 @@ function Dialog({ open, onClose, titleId, className = "", children }) {
   );
 }
 
+function useStableTouchViewport() {
+  useLayoutEffect(() => {
+    const media = gsap.matchMedia();
+    media.add("(hover: none) and (pointer: coarse)", () => {
+      const viewport = document.createElement("div");
+      viewport.className = "scroll-viewport-probe";
+      viewport.setAttribute("aria-hidden", "true");
+      document.body.append(viewport);
+
+      // The toolbar can resize the visual viewport without changing the layout.
+      const refreshEvents = "visibilitychange,DOMContentLoaded,load";
+      ScrollTrigger.config({ autoRefreshEvents: refreshEvents });
+      let width = viewport.clientWidth;
+      let height = viewport.clientHeight;
+      const observer = new ResizeObserver(() => {
+        const nextWidth = viewport.clientWidth;
+        const nextHeight = viewport.clientHeight;
+        if (width === nextWidth && height === nextHeight) return;
+        width = nextWidth;
+        height = nextHeight;
+        ScrollTrigger.refresh(true);
+      });
+      observer.observe(viewport);
+
+      return () => {
+        observer.disconnect();
+        viewport.remove();
+        ScrollTrigger.config({ autoRefreshEvents: `${refreshEvents},resize` });
+      };
+    });
+    return () => media.revert();
+  }, []);
+}
+
 function useSmoothScroll() {
   const engine = useRef(null);
   useEffect(() => {
@@ -340,7 +374,7 @@ function useChoreography(root, galleryTween) {
         });
       });
       media.add(
-        "(min-width: 1024px) and (min-height: 650px) and (prefers-reduced-motion: no-preference)",
+        "(min-width: 1024px) and (min-height: 650px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)",
         () => {
           const track = root.current.querySelector(".pool-track");
           const viewport = root.current.querySelector(".pool-viewport");
@@ -431,6 +465,7 @@ function App() {
       : [];
   });
   const [notice, setNotice] = useState("");
+  useStableTouchViewport();
   const scrollEngine = useSmoothScroll();
   useChoreography(root, galleryTween);
 

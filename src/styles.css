@@ -47,6 +47,14 @@
 body {
   margin: 0;
 }
+.scroll-viewport-probe {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 100svw;
+  height: 100svh;
+  visibility: hidden;
+  pointer-events: none;
+}
 button,
 input,
 textarea,
@@ -469,7 +477,7 @@ h2 {
 }
 .pool-card-image {
   width: 100%;
-  height: clamp(320px, 48vh, 680px);
+  height: clamp(320px, 48svh, 680px);
   display: block;
   position: relative;
   overflow: hidden;
@@ -518,7 +526,7 @@ h2 {
 .gallery-note > span {
   font-size: 10px;
 }
-@media (min-width: 1024px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 1024px) and (min-height: 650px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .pool-gallery#pools {
     overflow: clip;
     padding: 0;
@@ -1632,7 +1640,7 @@ h2 {
   }
   .pool-card-image {
     height: 430px;
-    max-height: 50vh;
+    max-height: 50svh;
   }
   .pool-caption h3 {
     font-size: 22px;
@@ -1847,7 +1855,7 @@ h2 {
     width: 84vw;
   }
   .pool-card-image {
-    height: 53vh;
+    height: 53svh;
     min-height: 310px;
     max-height: 530px;
   }
@@ -2329,7 +2337,7 @@ h2 {
     min-height: 260px;
   }
   .pool-card-image {
-    height: 42vh;
+    height: 42svh;
     min-height: 220px;
   }
   .pool-gallery {
