@@ -2,8 +2,8 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
-  height: clamp(290px, 55svh, 570px);
-  scroll-margin-top: clamp(64px, 17svh, 150px);
+  height: clamp(290px, calc(var(--stable-page-height, 100svh) * 0.55), 570px);
+  scroll-margin-top: clamp(64px, calc(var(--stable-page-height, 100svh) * 0.17), 150px);
   background: var(--paper);
 }
 
@@ -57,6 +57,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .waterline {
-    height: clamp(220px, 36svh, 400px);
+    height: clamp(220px, calc(var(--stable-page-height, 100svh) * 0.36), 400px);
   }
 }

@@ -123,43 +123,44 @@ function Dialog({ open, onClose, titleId, className = "", children }) {
   );
 }
 
-function useStableTouchViewport() {
+function useStableTouchViewport(pageScroller) {
   useLayoutEffect(() => {
-    const media = gsap.matchMedia();
-    media.add("(hover: none) and (pointer: coarse)", () => {
-      const viewport = document.createElement("div");
-      viewport.className = "scroll-viewport-probe";
-      viewport.setAttribute("aria-hidden", "true");
-      document.body.append(viewport);
+    if (!pageScroller) return;
+    const viewport = document.createElement("div");
+    viewport.className = "scroll-viewport-probe";
+    viewport.setAttribute("aria-hidden", "true");
+    document.body.append(viewport);
 
-      // The toolbar can resize the visual viewport without changing the layout.
-      const refreshEvents = "visibilitychange,DOMContentLoaded,load";
-      ScrollTrigger.config({ autoRefreshEvents: refreshEvents });
-      let width = viewport.clientWidth;
-      let height = viewport.clientHeight;
-      const observer = new ResizeObserver(() => {
-        const nextWidth = viewport.clientWidth;
-        const nextHeight = viewport.clientHeight;
-        if (width === nextWidth && height === nextHeight) return;
-        width = nextWidth;
-        height = nextHeight;
-        ScrollTrigger.refresh(true);
-      });
-      observer.observe(viewport);
-
-      return () => {
-        observer.disconnect();
-        viewport.remove();
-        ScrollTrigger.config({ autoRefreshEvents: `${refreshEvents},resize` });
-      };
+    // Keep section heights stable through toolbar and keyboard changes.
+    const refreshEvents = "visibilitychange,DOMContentLoaded,load";
+    ScrollTrigger.config({ autoRefreshEvents: refreshEvents });
+    let width = viewport.clientWidth;
+    const setPageHeight = () => {
+      pageScroller.style.setProperty("--stable-page-height", `${viewport.clientHeight}px`);
+    };
+    setPageHeight();
+    const observer = new ResizeObserver(() => {
+      const nextWidth = viewport.clientWidth;
+      if (width === nextWidth) return;
+      width = nextWidth;
+      setPageHeight();
+      ScrollTrigger.refresh(true);
     });
-    return () => media.revert();
-  }, []);
+    observer.observe(viewport);
+
+    return () => {
+      observer.disconnect();
+      viewport.remove();
+      pageScroller.style.removeProperty("--stable-page-height");
+      ScrollTrigger.config({ autoRefreshEvents: `${refreshEvents},resize` });
+    };
+  }, [pageScroller]);
 }
 
-function useSmoothScroll() {
+function useSmoothScroll(pageScroller) {
   const engine = useRef(null);
   useEffect(() => {
+    if (pageScroller) return;
     const media = gsap.matchMedia();
     media.add(
       "(any-pointer: fine) and (prefers-reduced-motion: no-preference)",
@@ -190,7 +191,7 @@ function useSmoothScroll() {
       },
     );
     return () => media.revert();
-  }, []);
+  }, [pageScroller]);
   return engine;
 }
 
@@ -439,7 +440,7 @@ function useChoreography(root, galleryTween) {
   }, [root, galleryTween]);
 }
 
-function App() {
+function App({ pageScroller }) {
   const isProductsPage = routePath().startsWith("/products");
   // Trial switch: ?water=off#contact shows the exact invitation without the effect.
   const waterReflectionsEnabled =
@@ -465,8 +466,8 @@ function App() {
       : [];
   });
   const [notice, setNotice] = useState("");
-  useStableTouchViewport();
-  const scrollEngine = useSmoothScroll();
+  useStableTouchViewport(pageScroller);
+  const scrollEngine = useSmoothScroll(pageScroller);
   useChoreography(root, galleryTween);
 
   useEffect(() => {
@@ -589,7 +590,7 @@ function App() {
       );
       const top = trigger.start + (trigger.end - trigger.start) * next;
       if (scrollEngine.current) scrollEngine.current.scrollTo(top);
-      else window.scrollTo({ top, behavior: "smooth" });
+      else (pageScroller ?? window).scrollTo({ top, behavior: "smooth" });
     } else {
       galleryViewport.current.scrollBy({
         left: direction * galleryViewport.current.clientWidth * 0.86,
@@ -607,7 +608,7 @@ function App() {
   );
 
   return (
-    <div ref={root}>
+    <div id="page-top" ref={root}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
@@ -668,6 +669,7 @@ function App() {
           <>
             <PerspectiveTunnelHero
               images={pools}
+              pageScroller={pageScroller}
               onStartProject={() => openEnquiry()}
               onSelectPool={setSelectedPool}
             />
@@ -1101,7 +1103,7 @@ function App() {
               Start your project <ArrowUpRight size={15} />
             </button>
           </nav>
-          <a className="back-top" href="#" aria-label="Back to top">
+          <a className="back-top" href="#page-top" aria-label="Back to top">
             <ArrowUpRight size={22} />
           </a>
         </div>

@@ -1,8 +1,9 @@
 .pool-hero {
   --hero-water: #e3f1ef;
   min-height: 680px;
-  height: 100svh;
-  padding: clamp(104px, 14svh, 140px) max(48px, calc((100vw - 1600px) / 2)) 32px;
+  height: var(--stable-page-height, 100svh);
+  padding: clamp(104px, calc(var(--stable-page-height, 100svh) * 0.14), 140px)
+    max(48px, calc((100vw - 1600px) / 2)) 32px;
   display: flex;
   flex-direction: column;
   background: var(--hero-water);
@@ -179,7 +180,6 @@
 }
 @media (max-width: 767px) {
   .pool-hero {
-    height: 100svh;
     min-height: 650px;
     padding: 100px 20px 25px;
   }

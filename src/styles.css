@@ -35,8 +35,9 @@
   --product-bg: #eef0f0;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --page-scroll-padding: 24px;
   scroll-behavior: smooth;
-  scroll-padding-top: 24px;
+  scroll-padding-top: var(--page-scroll-padding);
   scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -46,6 +47,22 @@
 }
 body {
   margin: 0;
+}
+.touch-page-scroll,
+.touch-page-scroll body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.touch-page-scroll #root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--page-scroll-padding);
+}
+.touch-page-scroll #root:has(dialog[open]) {
+  overflow-y: hidden;
 }
 .scroll-viewport-probe {
   position: fixed;
@@ -477,7 +494,7 @@ h2 {
 }
 .pool-card-image {
   width: 100%;
-  height: clamp(320px, 48svh, 680px);
+  height: clamp(320px, calc(var(--stable-page-height, 100svh) * 0.48), 680px);
   display: block;
   position: relative;
   overflow: hidden;
@@ -1640,7 +1657,7 @@ h2 {
   }
   .pool-card-image {
     height: 430px;
-    max-height: 50svh;
+    max-height: calc(var(--stable-page-height, 100svh) * 0.5);
   }
   .pool-caption h3 {
     font-size: 22px;
@@ -1709,7 +1726,7 @@ h2 {
 }
 @media (max-width: 767px) {
   :root {
-    scroll-padding-top: 16px;
+    --page-scroll-padding: 16px;
   }
   .shell {
     width: calc(100% - 40px);
@@ -1855,7 +1872,7 @@ h2 {
     width: 84vw;
   }
   .pool-card-image {
-    height: 53svh;
+    height: calc(var(--stable-page-height, 100svh) * 0.53);
     min-height: 310px;
     max-height: 530px;
   }
@@ -2337,7 +2354,7 @@ h2 {
     min-height: 260px;
   }
   .pool-card-image {
-    height: 42svh;
+    height: calc(var(--stable-page-height, 100svh) * 0.42);
     min-height: 220px;
   }
   .pool-gallery {

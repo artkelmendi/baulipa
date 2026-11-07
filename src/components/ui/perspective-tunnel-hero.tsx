@@ -17,6 +17,7 @@ export interface PoolInspiration {
 }
 interface PerspectiveTunnelHeroProps {
   images: PoolInspiration[];
+  pageScroller?: HTMLElement | null;
   onStartProject: () => void;
   onSelectPool: (pool: PoolInspiration) => void;
 }
@@ -24,10 +25,12 @@ const ease = [0.23, 1, 0.32, 1] as const;
 
 export default function PerspectiveTunnelHero({
   images,
+  pageScroller,
   onStartProject,
   onSelectPool,
 }: PerspectiveTunnelHeroProps) {
   const ref = useRef<HTMLElement>(null);
+  const scrollContainer = useRef(pageScroller ?? null);
   const [reduce, setReduce] = useState(
     () => matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
@@ -38,6 +41,7 @@ export default function PerspectiveTunnelHero({
     return () => query.removeEventListener("change", update);
   }, []);
   const { scrollYProgress } = useScroll({
+    container: pageScroller ? scrollContainer : undefined,
     target: ref,
     offset: ["start start", "end start"],
   });
